@@ -1,5 +1,9 @@
 # Datastore
 
+Cockroach DB 
+https://cockroachlabs.cloud/cluster/ec4982d5-3b31-40b1-a046-c7de92d45171/overview?cluster-type=serverless
+
+# TYG9SLwtWVGyFeg5oy7E1A
 this folder contains source code for the datastore portion of the project
 
 ## Database User Stories
@@ -68,7 +72,11 @@ TABLE Teams (
 );
 
 TABLE 
-    Sportsbooks
-    Player
-    Market 
-    EVENTID
+    EXBET1 FLOAT
+    EXBET2 FLOAT
+    EXBET3 VARCHAR(255)
+    SportsbooksID -- Foreign key reference to SportsBookComparision table
+    PlayerID -- Foreign key reference to Player table
+    EventID INT, -- Foreign key reference to Events table
+    FOREIGN KEY (PlayerID) REFERENCES Players(PlayerID),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID),
