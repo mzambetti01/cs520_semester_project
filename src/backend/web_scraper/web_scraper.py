@@ -56,7 +56,7 @@ class WebScraper():
                     "EVENT" : EVENT,
                     "market" : market,
                     "eventID": eventID,
-                    "player_name": player_name
+                    "player_name": player_name,
                 }
                 player_list.append(player_object)
 
@@ -67,6 +67,21 @@ class WebScraper():
             return None
     
     def get_player_odds(self, player_object):
+        """Given an intial player object, return final player, team , and sportbook objects
+
+        Args:
+            player_object json: 
+
+                player_object = {
+                    EVENT : int
+                    market : str,
+                    eventID : int,
+                    player_name :  str,
+                }
+
+        Returns:
+            _type_: _description_
+        """
         EVENT = player_object["EVENT"]
         market = player_object["market"]
         eventID = player_object["eventID"]
@@ -110,21 +125,42 @@ class WebScraper():
                 "TotalWins" : raw_team['records']['total']['wins'],
                 "TotalLosses" : raw_team['records']['total']['losses'],
                 "TotalTies" : raw_team['records']['total']['ties'],
-            }    
-            val = response_json['markets'][0]['comparison']
-            print(val)
+            } 
 
-        return response_json
-        team_object = {}
-        sportbook_objects = []
 
+            player_object = {
+                "PlayerID": response_json['markets'][0]['player']['id'],
+                "PlayerName" : player_name,
+                "TeamID": raw_team["id"]
+            }
+
+            sportbook_objects = []
+            
+            for book_name, book_object in response_json['markets'][0]['comparison'].items():
+                sportbook_object = {
+                    "SportsBookID" : book_object["sportsbook"],
+                    "SportsBookName" : book_name, 
+                    "Value": book_object["value"],
+                    "Over" : book_object["over"],
+                    "Under": book_object["under"],
+                    "EventID": eventID,
+                    "PlayerID": player_object["PlayerID"]
+                }
+                sportbook_objects.append(sportbook_object)
+
+        return player_object, team_object, sportbook_objects
+        
 logging.basicConfig(level=logging.INFO)
 
 scraper = WebScraper()
 player_list = scraper.get_player_list("nhl", "points")
-output = scraper.get_player_odds(player_list[0])
+player_object, team_object, sportsbook_objects = scraper.get_player_odds(player_list[0])
+
+print(player_object)
+print(team_object)
+print(sportsbook_objects)
 
 with open('player_responses.json', 'w') as json_file:
     json_file.truncate()
-    json.dump(output, json_file)
+    json.dump(sportsbook_objects, json_file)
 
