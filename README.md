@@ -1,5 +1,5 @@
 # cs520_semester_project
-This repository looks to hold all code with respect to the CS 520 class at UMass for Matt Zambetti, Anthony Zalev, and Sabrina Liangr>.
+This repository looks to hold all code with respect to the CS 520 class at UMass for Matt Zambetti, Anthony Zalev, and Sabrina Liang.
 
 ## web_scraper
 
