@@ -35,7 +35,7 @@ TABLE Players (
 
 -- Table to store sportsbook comparison
 TABLE SportsbookComparison (
-    SportsBookID INT PRIMARY KEY,
+    SportsBookID INT,
     SportsBookName VARCHAR(255),
     Value FLOAT,
     Over FLOAT,
