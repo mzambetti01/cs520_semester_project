@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import json
 import logging 
+
+
 class WebScraper():
 
     def __init__(self):
@@ -127,8 +129,13 @@ class WebScraper():
                 "TotalTies" : raw_team['records']['total']['ties'],
             } 
 
+            event_object ={
+                "eventid" : player_object["eventID"],
+                "eventname" :  player_object["EVENT"],
+                "market" : player_object["market"]
+            }
 
-            player_object = {
+            player_final_object = {
                 "PlayerID": response_json['markets'][0]['player']['id'],
                 "PlayerName" : player_name,
                 "TeamID": raw_team["id"]
@@ -144,23 +151,39 @@ class WebScraper():
                     "Over" : book_object["over"],
                     "Under": book_object["under"],
                     "EventID": eventID,
-                    "PlayerID": player_object["PlayerID"]
+                    "PlayerID": player_final_object["PlayerID"]
                 }
                 sportbook_objects.append(sportbook_object)
 
-        return player_object, team_object, sportbook_objects
+            
+        return player_final_object, team_object, sportbook_objects, event_object
         
 logging.basicConfig(level=logging.INFO)
 
 scraper = WebScraper()
 player_list = scraper.get_player_list("nhl", "points")
-player_object, team_object, sportsbook_objects = scraper.get_player_odds(player_list[0])
+player_object, team_object, sportsbook_objects, event_object = scraper.get_player_odds(player_list[0])
 
 print(player_object)
 print(team_object)
 print(sportsbook_objects)
 
-with open('player_responses.json', 'w') as json_file:
+with open('sportsbook_object.json', 'w') as json_file:
     json_file.truncate()
     json.dump(sportsbook_objects, json_file)
+
+with open('team_object.json', 'w') as json_file:
+    json_file.truncate()
+    json.dump(team_object, json_file)
+
+with open('player_object.json', 'w') as json_file:
+    json_file.truncate()
+    json.dump(player_object, json_file)
+
+with open('event_object.json', 'w') as json_file:
+    json_file.truncate()
+    json.dump(event_object, json_file)
+
+
+
 
