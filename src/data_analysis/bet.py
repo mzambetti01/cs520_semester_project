@@ -4,48 +4,49 @@ class Bet:
     def __init__(self, sports_book, event, value, side1_odds, side2_odds):
 
         # Basic information about the bed
-        self.sports_book = sports_book
-        self.event = event
-        self.value = value
-        self.side1_odds = side1_odds
-        self.side2_odds = side2_odds
+        self.SportsBookName = sports_book
+        self.Event = event
+        self.Value = value
+        self.OverOdds = side1_odds
+        self.UnderOdds = side2_odds
 
         # Calculating Implied Probabbility
-        self.imp_prob1 = Bet.calculate_implied_probability(side1_odds)
-        self.imp_prob2 = Bet.calculate_implied_probability(side2_odds)
-        self.total_prob = Bet.calculate_total_probability(self.imp_prob1, self.imp_prob2)
+        self.OverImpliedProb = Bet.calculate_implied_probability(self.OverOdds)
+        self.UnderImpliedProb = Bet.calculate_implied_probability(self.UnderOdds)
+        self.TotalImpliedProb = Bet.calculate_total_probability(self.OverImpliedProb, self.UnderImpliedProb)
 
         # Calculating Overage and Vig
-        self.overage = Bet.calculate_overage(self.total_prob)
-        self.vigorish = Bet.calculate_vigorish(self.overage, self.total_prob)
+        self.Overage = Bet.calculate_overage(self.TotalImpliedProb)
+        self.Vigorish = Bet.calculate_vigorish(self.Overage, self.TotalImpliedProb)
 
         # Calculating True Probabilty
-        self.adj_prob1 = Bet.calculate_adjusted_probability(self.imp_prob1, self.imp_prob2)
-        self.adj_prob2 = Bet.calculate_adjusted_probability(self.imp_prob2, self.imp_prob1)
-        self.adj_odds1 = Bet.calculate_adjusted_odds(self.side1_odds, self.adj_prob1)
-        self.adj_odds2 = Bet.calculate_adjusted_odds(self.side2_odds, self.adj_prob2)
-        
+        self.OverAdjustedProb = Bet.calculate_adjusted_probability(self.OverImpliedProb, self.UnderImpliedProb)
+        self.UnderAdjustedProb = Bet.calculate_adjusted_probability(self.UnderImpliedProb, self.OverImpliedProb)
+        self.OverAdjustedOdds = Bet.calculate_adjusted_odds(self.OverOdds, self.OverAdjustedProb)
+        self.UnderAdjustedOdds = Bet.calculate_adjusted_odds(self.UnderOdds, self.UnderAdjustedProb)
         # Making sure our adjusted odds are in valid ranges
         self.check_adj_odds()
-        
 
-        #self.ev1 = self.calculate_ev(self.odds1, self.adj_odds1, self.adj_prob1)
+        #self.ev1 = self.calculate_ev(self.odds1, self.adj_odds1, self.UnderAdjustedProb)
         #self.ev2 = self.calculate_ev(self.odds2, self.adj_odds2, self.adj_prob2)
 
     # Function to adjust odds if the numbers are in certain ranges
     def check_adj_odds(self):
         # Odds cant be between -100 and 100
-        if (self.adj_odds1 > -100 and self.adj_odds1 < 100):
-            remainder = -100 + self.adj_odds1
-            self.adj_odds1 = 100 - remainder
-        if (self.adj_odds2 > -100 and self.adj_odds2 < 100):
-            remainder = -100 + self.adj_odds2
-            self.adj_odds2 = 100 - remainder
-        if (self.adj_odds1 > 0 and self.adj_odds2 > 0):
-            if (self.adj_prob1 > self.adj_prob2):
-                self.adj_odds1 *= -1
+
+        if (self.OverAdjustedOdds > -100 and self.OverAdjustedOdds < 100):
+            remainder = -100 + self.OverAdjustedOdds
+            self.OverAdjustedOdds = 100 - remainder
+
+        if (self.UnderAdjustedOdds > -100 and self.UnderAdjustedOdds < 100):
+            remainder = -100 + self.UnderAdjustedOdds
+            self.UnderAdjustedOdds = 100 - remainder
+
+        if (self.OverAdjustedOdds > 0 and self.UnderAdjustedOdds > 0):
+            if (self.OverAdjustedProb > self.UnderAdjustedProb):
+                self.OverAdjustedOdds *= -1
             else:
-                self.adj_odds2 *= -1
+                self.UnderAdjustedOdds *= -1
 
 
     # Function to find implied probability from the odds
@@ -86,6 +87,10 @@ class Bet:
     # Function to calculate expected value using vig and 0-vig odds
     def calculate_ev(vig_odds, zero_vig_odds, win_percent):
         return ((vig_odds-zero_vig_odds)*win_percent)
+    
+    # Fnuction to covert bet object to json
+    def to_json(self):
+        pass
 
     # To string Function
     def to_string(self):
