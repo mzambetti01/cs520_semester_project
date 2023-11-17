@@ -1,25 +1,43 @@
 # Datastructure to store the information on a bet
 class Bet:
     # Initializing information about the bet
-    def __init__(self, name, book, side1, side2, odds1, odds2):
-        self.name = name
-        self.book = book
-        self.side1 = side1
-        self.side2 = side2
-        self.odds1 = odds1
-        self.odds2 = odds2
-        self.imp_prob1 = self.calculate_implied_probability(odds1)
-        self.imp_prob2 = self.calculate_implied_probability(odds2)
-        self.total_prob = self.calculate_total_probability(odds1, odds2)
-        self.overage = self.calculate_overage(self.total_prob)
-        self.vigorish = self.calculate_vigorish(self.overage, self.total_prob)
-        self.adj_prob1 = self.calculate_adjusted_probability(self.imp_prob1, self.imp_prob2)
-        self.adj_prob2 = self.calculate_adjusted_probability(self.imp_prob2, self.imp_prob1)
-        self.adj_odds1 = self.calculate_adjusted_odds(self.odds1, self.adj_prob1)
+    def __init__(self, sports_book, event, value, side1_odds, side2_odds):
+
+        # Basic information about the bed
+        self.sports_book = sports_book
+        self.event = event
+        self.value = value
+        self.side1_odds = side1_odds
+        self.side2_odds = side2_odds
+
+        # Calculating Implied Probabbility
+        self.imp_prob1 = Bet.calculate_implied_probability(side1_odds)
+        self.imp_prob2 = Bet.calculate_implied_probability(side2_odds)
+        self.total_prob = Bet.calculate_total_probability(self.imp_prob1, self.imp_prob2)
+
+        # Calculating Overage and Vig
+        self.overage = Bet.calculate_overage(self.total_prob)
+        self.vigorish = Bet.calculate_vigorish(self.overage, self.total_prob)
+
+        # Calculating True Probabilty
+        self.adj_prob1 = Bet.calculate_adjusted_probability(self.imp_prob1, self.imp_prob2)
+        self.adj_prob2 = Bet.calculate_adjusted_probability(self.imp_prob2, self.imp_prob1)
+        self.adj_odds1 = Bet.calculate_adjusted_odds(self.side1_odds, self.adj_prob1)
+        self.adj_odds2 = Bet.calculate_adjusted_odds(self.side2_odds, self.adj_prob2)
+        
+        # Making sure our adjusted odds are in valid ranges
+        self.check_adj_odds()
+        
+
+        #self.ev1 = self.calculate_ev(self.odds1, self.adj_odds1, self.adj_prob1)
+        #self.ev2 = self.calculate_ev(self.odds2, self.adj_odds2, self.adj_prob2)
+
+    # Function to adjust odds if the numbers are in certain ranges
+    def check_adj_odds(self):
+        # Odds cant be between -100 and 100
         if (self.adj_odds1 > -100 and self.adj_odds1 < 100):
             remainder = -100 + self.adj_odds1
             self.adj_odds1 = 100 - remainder
-        self.adj_odds2 = self.calculate_adjusted_odds(self.odds2, self.adj_prob2)
         if (self.adj_odds2 > -100 and self.adj_odds2 < 100):
             remainder = -100 + self.adj_odds2
             self.adj_odds2 = 100 - remainder
@@ -29,11 +47,9 @@ class Bet:
             else:
                 self.adj_odds2 *= -1
 
-        #self.ev1 = self.calculate_ev(self.odds1, self.adj_odds1, self.adj_prob1)
-        #self.ev2 = self.calculate_ev(self.odds2, self.adj_odds2, self.adj_prob2)
 
     # Function to find implied probability from the odds
-    def calculate_implied_probability(self, american_odds):
+    def calculate_implied_probability(american_odds):
         # If odds are positive
         # implied probability = 100 / (odds + 100)
         if (american_odds > 0):
@@ -45,30 +61,30 @@ class Bet:
             return (american_odds / (american_odds + 100))
     
     # Function to calcuate total probability
-    def calculate_total_probability(self, odds1, odds2):
+    def calculate_total_probability(odds1, odds2):
         return (odds1+odds2)
     
     # Function to calculate overage
-    def calculate_overage(self, total_prob):
+    def calculate_overage(total_prob):
         return (total_prob-1)
 
     # Function to calculate vigorish
-    def calculate_vigorish(self, overage, total_prob):
+    def calculate_vigorish(overage, total_prob):
         return (overage/total_prob)
     
     # Function to calculate adjusted probability
-    def calculate_adjusted_probability(self, prob1, prob2):
+    def calculate_adjusted_probability(prob1, prob2):
         return (prob1 / (prob1 + prob2))
     
     # Function to calculate adjusted odds
-    def calculate_adjusted_odds(self, american_odds, prob):
+    def calculate_adjusted_odds(american_odds, prob):
         if (american_odds > 0):
             return ((100*(1-prob))/prob)
         else:
             return (-1*(prob*100)/(prob-1))
         
     # Function to calculate expected value using vig and 0-vig odds
-    def calculate_ev(self, vig_odds, zero_vig_odds, win_percent):
+    def calculate_ev(vig_odds, zero_vig_odds, win_percent):
         return ((vig_odds-zero_vig_odds)*win_percent)
 
     # To string Function
