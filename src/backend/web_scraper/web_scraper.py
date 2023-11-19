@@ -158,6 +158,7 @@ class WebScraper():
             
         return player_final_object, team_object, sportbook_objects, event_object
         
+"""
 logging.basicConfig(level=logging.INFO)
 
 scraper = WebScraper()
@@ -182,8 +183,8 @@ with open('player_object.json', 'w') as json_file:
 
 with open('event_object.json', 'w') as json_file:
     json_file.truncate()
-    json.dump(event_object, json_file)
+    json.dump(event_object, json_file)  
 
-
+"""
 
 
