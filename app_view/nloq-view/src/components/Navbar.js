@@ -4,13 +4,17 @@ import './Navbar.css';
 import logo from '../imgs/nloq-logo-main.png';
 
 const Navbar = () => (
+  <div className='navbar-container'>
   <nav>
     <Link to="/">
       <img src={logo} alt="Logo" className="logo" />
     </Link>
     <ul>
       <li>
-        <Link to="/nba">Home</Link>
+        <Link to="/nba">NBA</Link>
+      </li>
+      <li>
+        <Link to="/mlb">MLB</Link>
       </li>
       <li className="dropdown">
         <div>Resources</div>
@@ -22,6 +26,7 @@ const Navbar = () => (
       </li>
     </ul>
   </nav>
+  </div>
 );
 
 export default Navbar;

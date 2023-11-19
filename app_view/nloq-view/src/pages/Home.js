@@ -1,8 +1,10 @@
 import React from "react";
-import Table from '../table/Table';
+import Table from './PageContent';
 
 function Home(){
-    return (<div> <Table /> </div>);
+    return (
+        <div> <Table /> </div>
+    );
 }
 
 export default Home;
