@@ -1,6 +1,7 @@
 import React from 'react';
+import './Page.css'
 
-const TableData = ({ filter, league, page }) => {
+const Table = ({ filter, league, page }) => {
   // fake data
   const data = [
     { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'League A' },
@@ -15,12 +16,6 @@ const TableData = ({ filter, league, page }) => {
     //   item.category.toLowerCase().includes(filter.toLowerCase())
   );
 
-  const itemsPerPage = 2;
-  const startIndex = (page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  const slicedData = filteredData.slice(startIndex, endIndex);
-
   return (
     <table className="table">
       <thead>
@@ -31,7 +26,7 @@ const TableData = ({ filter, league, page }) => {
         </tr>
       </thead>
       <tbody>
-        {slicedData.map((item) => (
+        {data.map((item) => (
           <tr key={item.id}>
             <td>{item.name}</td>
             <td>{item.prop_type}</td>
@@ -43,4 +38,4 @@ const TableData = ({ filter, league, page }) => {
   );
 };
 
-export default TableData;
+export default Table;

@@ -1,0 +1,68 @@
+import React, { useState } from 'react';
+import TableData from './Table';
+import './Page.css'
+
+const Table = () => {
+  const [filter, setFilter] = useState('');
+  const [sortOption, setSortOption] = useState(null);
+  const [detailedView, setDetailedView] = useState(false);
+  const [sortClicked, setSortClicked] = useState(false);
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
+
+  const handleFilterClick = () => {
+    // Trigger filtering logic here
+    console.log('Filtering...');
+  };
+
+  const handleSortClick = () => {
+    // Show options for sorting by player name or expected values
+    setSortClicked(!sortClicked);
+    console.log('Sorting...');
+  };
+
+  const handleSortOptionClick = (option) => {
+    // Trigger sorting logic based on the selected option
+    console.log(`Sorting by ${option}`);
+    setSortOption(option);
+  };
+
+  const handleDetailViewClick = () => {
+    // Toggle detailed view
+    setDetailedView(!detailedView);
+  };
+
+  const handleRefreshClick = () => {
+    // Trigger data refresh logic here
+    console.log('Refreshing...');
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={filter}
+        onChange={handleFilterChange}
+      /> 
+      <button onClick={handleFilterClick}>Search</button>
+      <button onClick={handleSortClick}>Sort</button>
+      {sortClicked && (
+        <div>
+          Sort by:
+          <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
+          <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
+        </div>
+      )}
+      <button onClick={handleDetailViewClick}>
+        {detailedView ? 'Hide Details' : 'Show Details'}
+      </button>
+      <button onClick={handleRefreshClick}>Refresh</button>
+      <TableData filter={filter}/>
+    </div>
+  );
+};
+
+export default Table;

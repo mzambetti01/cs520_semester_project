@@ -1,11 +1,12 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import LeaguePage from './pages/LeaguePage';
+import Home from './content/Home';
+import LeaguePage from './content/LeaguePage';
+import Footer from './components/Footer';
 
 function App() {
-  
+
 
   return (
     <Router>
@@ -20,6 +21,7 @@ function App() {
         </Routes>
       </div>
     </div>
+    <div> <Footer /> </div>
     </Router>
   );
 }
