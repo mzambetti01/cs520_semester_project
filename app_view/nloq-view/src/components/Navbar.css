@@ -3,13 +3,15 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
+  background-color: #4EA9F3;
   padding: 10px;
   color: white;
 }
 
 .logo {
-  width: 50px; /* Adjust the width as needed */
+  width: 90px; /* Adjust the width as needed */
+  position: absolute;
+  top: 0;
 }
 
 ul {
