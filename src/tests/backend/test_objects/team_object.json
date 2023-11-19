@@ -1,0 +1,21 @@
+{
+    "TeamID": 20,
+    "City": "St. Louis",
+    "TeamName": "Blues",
+    "Conference": "Western",
+    "Division": "Central",
+    "PointsPerGame": 2.85,
+    "OpponentPointsPerGame": 2.77,
+    "Wins": 7,
+    "Losses": 6,
+    "Ties": 0,
+    "MoneylineWins": 7,
+    "MoneylineLosses": 6,
+    "MoneylineTies": 0,
+    "SpreadWins": 7,
+    "SpreadLosses": 6,
+    "SpreadTies": 0,
+    "TotalWins": 4,
+    "TotalLosses": 8,
+    "TotalTies": 1
+}

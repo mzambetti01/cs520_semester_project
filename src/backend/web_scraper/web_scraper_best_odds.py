@@ -5,6 +5,7 @@ import pandas as pd
 # Define the URL
 url = "https://www.scoresandodds.com/nba/props/points"
 # https://rga51lus77.execute-api.us-east-1.amazonaws.com/prod/market-comparison?event=nba%2F19640&market=points&filter=Damian%20Lillard&t=1698595309.853
+
 # Send an HTTP GET request to the URL
 response = requests.get(url)
 

@@ -1,8 +1,18 @@
 from bet import Bet
-
+import json
 # Normal bet is one defined as one positive and one negative side
 def testNormalBet():
-    bet = Bet("Barstool", "Matt Zambetti Saves", 3.5, -125, 115)
+    bet_object = {
+        "SportsBookID": 15,
+        "SportsBookName": "draftkings",
+        "Value": 3.5,
+        "Over": -125,
+        "Under": 115,
+        "EventID": "20855",
+        "PlayerID": 17181
+    }
+    bet = Bet(bet_object)
+    #bet = Bet("Barstool", "Matt Zambetti Saves", 3.5, -125, 115)
 
     # Checking implied probs
     # Side 1: 55.56%, Side 2: 46.51%
@@ -26,6 +36,8 @@ def testNormalBet():
     # Side 1: -120, Side 2: 120
     adjusted_odds = ((round(bet.OverAdjustedOdds, 1)==-119.4) and (round(bet.UnderAdjustedOdds, 1)==119.4))
     print("Adjusted Odds are correct:", adjusted_odds)
+
+
 
 # Testing when both sides of the bet are negative
 def testDoubleNegative():

@@ -1,0 +1,4 @@
+{
+    "nba" : ["Points", "Rebounds", "Assists", "Blocks", "Steals", "3 Pointers", "Points & Rebounds", "Points & Assists", "Points, Rebounds, & Assists"],
+    "nhl" : ["Goals", " Shots on Goal", "Assists", "Points", "Blocked Shots"]
+}

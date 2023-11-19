@@ -23,7 +23,6 @@ TABLE Events (
     EventID INT PRIMARY KEY, # assigned by the webscraper
     EventName VARCHAR(255) #NBA/NHL/NFL
     Market VARCHAR(255)
-
 );
 
 -- Table to store player information
@@ -36,8 +35,8 @@ TABLE Players (
 
 -- Table to store sportsbook comparison
 TABLE SportsbookComparison (
-    SportsbookID INT PRIMARY KEY,
-    SportsbookName VARCHAR(255),
+    SportsBookID INT,
+    SportsBookName VARCHAR(255),
     Value FLOAT,
     Over FLOAT,
     Under FLOAT,
