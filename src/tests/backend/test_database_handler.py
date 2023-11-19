@@ -44,4 +44,11 @@ def test_valid_insertion():
     val_4 = db_handler.read_sportsbooks(eventid)
     assert(all(val_1, val_2, val_3, val_4))
 
-    
+def test_null_value_insertion():
+    db_handler = DatabaseHandler()
+    print(db_handler.nuke_database())
+    assert db_handler.insert_scrapering_data(player_object, event_object, team_object, sportsbook_list) == False
+    pass 
+
+def test_invalid_structure_insertion():
+    pass
