@@ -25,8 +25,8 @@ with conn.cursor() as cur:
     )
     cur.execute(
     """
-        CREATE TABLE IF NOT EXISTS NLOQ.SportsbookComparison (
-            SportsBookID INT,
+        CREATE TABLE NLOQ.SportsbookComparison (
+            SportsBookID INT PRIMARY KEY,
             SportsBookName VARCHAR(255),
             Value FLOAT,
             Over FLOAT,
@@ -60,6 +60,29 @@ with conn.cursor() as cur:
             TotalWins INT,
             TotalLosses INT,
             TotalTies INT
+        )
+    """
+    )
+    cur.execute(
+    """
+        CREATE TABLE IF NOT EXISTS NLOQ.BetAnalysis(
+        SportsBookID INT,
+        SportsBookName VARCHAR(255),
+        EventID INT,
+        PlayerID INT,
+        ExpectedValue FLOAT,
+        OverImpliedProb FLOAT,
+        UnderImpliedProb FLOAT,
+        TotalImpliedProb FLOAT,
+        Overage FLOAT,
+        Vigorish FLOAT,
+        OverAdjustedProb FLOAT,
+        UnderAdjustedProb FLOAT,
+        OverAdjustedOdds FLOAT,
+        UnderAdjustedOdds FLOAT,
+        CONSTRAINT a FOREIGN KEY (EventID) REFERENCES NLOQ.Events(EventID),
+        CONSTRAINT b FOREIGN KEY (SportsBookID) REFERENCES NLOQ.SportsbookComparison(SportsBookID),
+        CONSTRAINT c FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID)
         )
     """
     )

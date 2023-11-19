@@ -1,16 +1,28 @@
 import psycopg2
 import logging
 import os 
-
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+from src.backend.data_analysis.bet import Bet
 
 class DatabaseHandler():
     
     def __init__(self):
         self.DATABASE_URL =  "postgresql://anthony:TYG9SLwtWVGyFeg5oy7E1A@scary-grizzly-6061.g8z.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full"
 
-    def nuke_database(self):
+    def delete_database(self):
+        with psycopg2.connect(self.DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("DROP TABLE IF EXISTS NLOQ.betanalysis")
+                cur.execute("DROP TABLE IF EXISTS NLOQ.SportsbookComparison")
+                cur.execute("DROP TABLE IF EXISTS NLOQ.Players")
+                cur.execute("DROP TABLE IF EXISTS NLOQ.Events")
+                cur.execute("DROP TABLE IF EXISTS NLOQ.Teams")
+        conn.commit()
+
+    def reset_database(self):
         with psycopg2.connect(self.DATABASE_URL) as conn:
                 with conn.cursor() as cur:
+                    cur.execute("DELETE FROM NLOQ.betanalysis")
                     cur.execute("DELETE FROM NLOQ.SportsbookComparison")
                     cur.execute("DELETE FROM NLOQ.Players")
                     cur.execute("DELETE FROM NLOQ.Events")
@@ -131,6 +143,42 @@ class DatabaseHandler():
         
         return True
 
+    def insert_sports_analysis(self, bet_object):
+        try:
+            with psycopg2.connect(self.DATABASE_URL) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO NLOQ.BetAnalysis 
+                        (SportsBookID, SportsBookName, EventID, PlayerID, ExpectedValue,
+                        OverImpliedProb, UnderImpliedProb, TotalImpliedProb, Overage, Vigorish,
+                        OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (
+                            bet_object["SportsBookID"],
+                            bet_object["SportsBookName"],
+                            bet_object["EventID"],
+                            bet_object["PlayerID"],
+                            bet_object["ExpectedValue"],
+                            bet_object["OverImpliedProb"],
+                            bet_object["UnderImpliedProb"],
+                            bet_object["TotalImpliedProb"],
+                            bet_object["Overage"],
+                            bet_object["Vigorish"],
+                            bet_object["OverAdjustedProb"],
+                            bet_object["UnderAdjustedProb"],
+                            bet_object["OverAdjustedOdds"],
+                            bet_object["UnderAdjustedOdds"]
+                        )
+                    )
+            conn.commit()
+        except Exception as e:
+            logging.info(f"Exception during insertion: {e}")
+            return False
+        
+        return True
+    
     def read_team(self, teamid):
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
@@ -159,6 +207,12 @@ class DatabaseHandler():
                 sportsbooks = cur.fetchall()
         return sportsbooks
 
+    def read_sportbook_analysis(self, eventid, playerid, sportbookid):
+        with psycopg2.connect(self.DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM NLOQ.betanalysis WHERE eventid = %s AND playerid = %s AND sportsbookid = %s ", (eventid,playerid, sportbookid,))
+                sportsbooks = cur.fetchall()
+        return sportsbooks
 
     def insert_scrapering_data(self, player_object, event_object, team_object, sportsbook_list):
         """
@@ -219,7 +273,16 @@ class DatabaseHandler():
         val3 = self.insert_team(team_object)
 
         for sportsbook in sportsbook_list:
-            if (self.insert_sportsbook(sportsbook) == False):
-                return False
+            valid = True
+            for key, value in sportsbook.items():
+                if value is None:
+                    valid = False
+            if valid:
+                if (self.insert_sportsbook(sportsbook) == False):
+                    return False
+                #print(sportsbook)
+                if (self.insert_sports_analysis(Bet(sportsbook).get_bet_object()) == False):
+                    return False
+            
 
         return True
