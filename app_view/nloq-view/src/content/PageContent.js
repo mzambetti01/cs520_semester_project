@@ -4,24 +4,24 @@ import Footer from '../components/Footer';
 import './Page.css'
 
 const PageContent = ({ leagueName }) => {
-  const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
   const [sortOption, setSortOption] = useState(null);
   const [detailedView, setDetailedView] = useState(false);
   const [sortClicked, setSortClicked] = useState(false);
 
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
   };
 
-  const handleFilterClick = () => {
+  const handleSeachClick = () => {
     // Trigger filtering logic here
-    console.log('Filtering...');
+    console.log('searching...');
   };
 
   const handleSortClick = () => {
     // Show options for sorting by player name or expected values
     setSortClicked(!sortClicked);
-    if (sortClicked) {
+    if (!sortClicked) {
       setSortOption(null);
     }
     console.log('Sorting...');
@@ -46,22 +46,24 @@ const PageContent = ({ leagueName }) => {
   return (
     <div className='main'>
       <div className='wrapper'>
-        <div className='content-head'>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={filter}
-            onChange={handleFilterChange}
-          /> 
-          <button onClick={handleFilterClick}>Search</button>
-          <button onClick={handleSortClick}>Sort</button>
+        <div className='buttons-container'>
+          <div className='search'>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={handleSearchChange}
+            /> 
+            <button onClick={handleSeachClick}>Search</button>
+          </div>
+          <button onClick={handleSortClick}>Sort
           {sortClicked && (
-            <div>
+            <div className='sort-options'>
               Sort by:
               <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
               <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
             </div>
-          )}
+          )}</button>
           <button onClick={handleDetailViewClick}>
             {detailedView ? 'Hide Details' : 'Show Details'}
           </button>

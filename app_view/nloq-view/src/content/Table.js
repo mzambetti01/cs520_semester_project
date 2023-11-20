@@ -13,7 +13,7 @@ const findColor = (exp_val, max_val, min_val) => {
 }
 
 const Table = ({ sort, league, detailed }) => {
-  // fake data
+  // fake data, need to integrate and grab real data
   const data = [
     { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
     { id: 2, name: 'Item 2', prop_type: 'Category B', exp_val: 0.7, league: 'NBA', overAdj: 4, underAdj: 2 },

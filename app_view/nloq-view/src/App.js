@@ -4,8 +4,6 @@ import Navbar from './components/Navbar';
 import PageContent from './content/PageContent';
 
 function App() {
-
-
   return (
     <Router>
     <div className="App">

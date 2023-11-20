@@ -18,19 +18,19 @@
 
 .table td {
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #f3f3f3;
     border-top: 50px;
 }
 
 td .subrow {
     width: 100%;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #f3f3f3;
 }
   
 /* Table Head Style */
 .table thead {
-    background-color: rgb(188, 209, 32);
+    background-color: #75bcf6;
 }
    
 /* Table Body Style */
