@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Table from './Table';
 import Footer from '../components/Footer';
 import './Page.css'
@@ -10,6 +10,7 @@ const PageContent = ({ leagueName }) => {
   const [sortDropdown, setSortDropdown] = useState(false)
   const [detailedView, setDetailedView] = useState(false);
   const [sortClicked, setSortClicked] = useState(false);
+  const [matched, setMatched] = useState(true);
 
   const handleSeachClick = () => {
     // Trigger filtering logic here
@@ -47,7 +48,7 @@ const PageContent = ({ leagueName }) => {
     <div className='main'>
       <div className='wrapper'>
         <div className='buttons-container'>
-          <div className='search'>
+          <div className={`search ${!matched ? 'no-match' : ''}`}>
             <input
               type="text"
               placeholder="Search..."
@@ -70,7 +71,7 @@ const PageContent = ({ leagueName }) => {
           <button onClick={handleRefreshClick}>Refresh</button>
         </div>
         
-        <Table sort={sortOption} league={ leagueName } detailed={ detailedView } search={ search }/>
+        <Table sort={sortOption} league={ leagueName } detailed={ detailedView } search={ search } setMatched={setMatched}/>
       </div>
       
       <div> <Footer /> </div>

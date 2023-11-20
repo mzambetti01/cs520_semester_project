@@ -32,7 +32,7 @@ const sortingData = (data, sortby) => {
   return data
 }
 
-const Table = ({ sort, league, detailed, search }) => {
+const Table = ({ sort, league, detailed, search, setMatched }) => {
   // fake data, need to integrate and grab real data
   const data = [
     { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
@@ -58,9 +58,11 @@ const Table = ({ sort, league, detailed, search }) => {
   // if searched, set highlight to true
   tableData = tableData.map((item) => ({
     ...item,
-    highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.prop_type.toLowerCase().includes(search.toLowerCase())
+      highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase()) ||
+                   item.prop_type.toLowerCase().includes(search.toLowerCase())
   }));
+  let match = tableData.reduce((acc, x) => acc || x.highlighted, false)
+  setMatched(match)
 
   return (
     <div className='table-container'>

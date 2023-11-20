@@ -13,13 +13,13 @@
 
 /* to-do: styling for buttons */
 .buttons-container {
-    position: fixed;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
-    margin-left: 40px;
-    margin-right: 40px;
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 .button-container > * { /* for all the buttons */
@@ -27,15 +27,15 @@
 }
 
 button {
-    background-color: #288ee1;
-    color: #FCDB7C;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    font-size: 15px;
-    border: 0cap;
-    font-weight: bold;
+  background-color: #288ee1;
+  color: #FCDB7C;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 15px;
+  border: 0cap;
+  font-weight: bold;
 }
 
 button:hover{
@@ -43,42 +43,46 @@ button:hover{
 }
 
 input {
-    background-color: #fcf2d4;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    font-size: 15px;
-    border: 0cap;
+  background-color: #fcf2d4;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 15px;
+  border: 0cap;
 }
 
 input::placeholder {
-    color: #68b1ec; 
-  }
+  color: #68b1ec; 
+}
+
+.search.no-match input {
+  outline: 2px solid red; /* Set the border color to highlight the input box */
+}
 
 .sort-options {
-    position: absolute;
-    text-align: left;
-    font-weight: bold;
-    padding: 10px;
-    top: 100%; 
-    background-color: #ffe390;
-    color: #68b1ec;
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
+  position: absolute;
+  text-align: left;
+  font-weight: bold;
+  padding: 10px;
+  top: 100%; 
+  background-color: #ffe390;
+  color: #68b1ec;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
   
-  .sort-options button {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    text-align: left;
-    border: none;
-    background-color: #ffe390;
-    color: #68b1ec;
-    font-weight: lighter;
-  }
+.sort-options button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  text-align: left;
+  border: none;
+  background-color: #ffe390;
+  color: #68b1ec;
+  font-weight: lighter;
+}
   
-  .sort-options button:hover {
-    background-color: #ffecb4;
-  }
+.sort-options button:hover {
+  background-color: #ffecb4;
+}
