@@ -1,4 +1,9 @@
 from database_handler import DatabaseHandler
 
+
 database = DatabaseHandler()
-database.delete_database()
+#database.reset_database()
+#print(database.read_players())
+
+
+

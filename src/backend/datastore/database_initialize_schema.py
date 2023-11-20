@@ -26,7 +26,7 @@ with conn.cursor() as cur:
     cur.execute(
     """
         CREATE TABLE NLOQ.SportsbookComparison (
-            SportsBookID INT PRIMARY KEY,
+            SportsBookID INT,
             SportsBookName VARCHAR(255),
             Value FLOAT,
             Over FLOAT,
@@ -34,7 +34,8 @@ with conn.cursor() as cur:
             EventID INT, 
             PlayerID INT, 
             CONSTRAINT a FOREIGN KEY (EventID) REFERENCES NLOQ.Events(EventID),
-            CONSTRAINT b FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID)
+            CONSTRAINT b FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID),
+            CONSTRAINT c primary key(SportsBookID, EventID, PlayerID)
             )
     """
     )
@@ -81,8 +82,8 @@ with conn.cursor() as cur:
         OverAdjustedOdds FLOAT,
         UnderAdjustedOdds FLOAT,
         CONSTRAINT a FOREIGN KEY (EventID) REFERENCES NLOQ.Events(EventID),
-        CONSTRAINT b FOREIGN KEY (SportsBookID) REFERENCES NLOQ.SportsbookComparison(SportsBookID),
-        CONSTRAINT c FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID)
+        CONSTRAINT c FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID),
+        CONSTRAINT d PRIMARY key(SportsBookID, EventID, PlayerID)
         )
     """
     )

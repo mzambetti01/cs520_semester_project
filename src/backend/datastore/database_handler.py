@@ -1,7 +1,9 @@
 import psycopg2
 import logging
 import os 
+import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+sys.path.insert(0, project_root)
 from src.backend.data_analysis.bet import Bet
 
 class DatabaseHandler():
@@ -51,7 +53,7 @@ class DatabaseHandler():
                             print(f"Event with ID {event_id} already exists in the table. Skipping insertion.")
                     conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion eventid: {e}")
             return False
         
         return True
@@ -61,14 +63,18 @@ class DatabaseHandler():
             with psycopg2.connect(self.DATABASE_URL) as conn:
                 with conn.cursor() as cur:
                     cur.execute(
-                        "INSERT INTO NLOQ.Players (PlayerID, PlayerName, TeamID) VALUES (%s, %s, %s)",
+                        """ 
+                        INSERT INTO NLOQ.Players (PlayerID, PlayerName, TeamID) VALUES (%s, %s, %s)
+                        ON CONFLICT (PlayerID) DO UPDATE
+                        SET PlayerName = EXCLUDED.PlayerName, TeamID = EXCLUDED.TeamID
+                        """,
                         (player_object["PlayerID"],
                         player_object["PlayerName"],
                         player_object["TeamID"])
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of player_object: {e}")
             return False
         
         return True
@@ -82,6 +88,14 @@ class DatabaseHandler():
                         INSERT INTO NLOQ.SportsbookComparison 
                         (SportsBookID, SportsBookName, Value, Over, Under, EventID, PlayerID) 
                         VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID) DO UPDATE
+                        SET
+                        SportsBookName = EXCLUDED.SportsBookName,
+                        Value = EXCLUDED.Value,
+                        Over = EXCLUDED.Over,
+                        Under = EXCLUDED.Under,
+                        EventID = EXCLUDED.EventID,
+                        PlayerID = EXCLUDED.PlayerID;
                         """,
                             (
                             sportsbook_object["SportsBookID"],
@@ -96,7 +110,7 @@ class DatabaseHandler():
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of sportsbook object: {e}")
             return False
         
         return True
@@ -113,6 +127,26 @@ class DatabaseHandler():
                         MoneylineLosses, MoneylineTies, SpreadWins, SpreadLosses, 
                         SpreadTies, TotalWins, TotalLosses, TotalTies)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (TeamID) DO UPDATE
+                        SET
+                        City = EXCLUDED.City,
+                        TeamName = EXCLUDED.TeamName,
+                        Conference = EXCLUDED.Conference,
+                        Division = EXCLUDED.Division,
+                        PointsPerGame = EXCLUDED.PointsPerGame,
+                        OpponentPointsPerGame = EXCLUDED.OpponentPointsPerGame,
+                        Wins = EXCLUDED.Wins,
+                        Losses = EXCLUDED.Losses,
+                        Ties = EXCLUDED.Ties,
+                        MoneylineWins = EXCLUDED.MoneylineWins,
+                        MoneylineLosses = EXCLUDED.MoneylineLosses,
+                        MoneylineTies = EXCLUDED.MoneylineTies,
+                        SpreadWins = EXCLUDED.SpreadWins,
+                        SpreadLosses = EXCLUDED.SpreadLosses,
+                        SpreadTies = EXCLUDED.SpreadTies,
+                        TotalWins = EXCLUDED.TotalWins,
+                        TotalLosses = EXCLUDED.TotalLosses,
+                        TotalTies = EXCLUDED.TotalTies;
                         """,
                         (
                             team_object["TeamID"],
@@ -138,7 +172,7 @@ class DatabaseHandler():
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of team object: {e}")
             return False
         
         return True
@@ -154,6 +188,7 @@ class DatabaseHandler():
                         OverImpliedProb, UnderImpliedProb, TotalImpliedProb, Overage, Vigorish,
                         OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID) DO NOTHING;
                         """,
                         (
                             bet_object["SportsBookID"],
@@ -174,7 +209,7 @@ class DatabaseHandler():
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of sports bet: {e}")
             return False
         
         return True
