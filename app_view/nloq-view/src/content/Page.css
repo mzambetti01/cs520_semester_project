@@ -38,6 +38,10 @@ button {
     font-weight: bold;
 }
 
+button:hover{
+  background-color: #4EA9F3;
+}
+
 input {
     background-color: #fcf2d4;
     padding-left: 5px;

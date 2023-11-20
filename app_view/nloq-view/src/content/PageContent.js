@@ -5,32 +5,32 @@ import './Page.css'
 
 const PageContent = ({ leagueName }) => {
   const [search, setSearch] = useState('');
-  const [sortOption, setSortOption] = useState(null);
+  const [searchHolder, setSearchHolder] = useState('');
+  const [sortOption, setSortOption] = useState('');
+  const [sortDropdown, setSortDropdown] = useState(false)
   const [detailedView, setDetailedView] = useState(false);
   const [sortClicked, setSortClicked] = useState(false);
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
-
   const handleSeachClick = () => {
     // Trigger filtering logic here
-    console.log('searching...');
+    setSearch(searchHolder);
   };
 
   const handleSortClick = () => {
     // Show options for sorting by player name or expected values
     setSortClicked(!sortClicked);
-    if (!sortClicked) {
-      setSortOption(null);
+    if (sortClicked) {
+      setSortDropdown(true)
+    } else {
+      setSortDropdown(false)
     }
-    console.log('Sorting...');
   };
 
   const handleSortOptionClick = (option) => {
     // Trigger sorting logic based on the selected option
     console.log(`Sorting by ${option}`);
     setSortOption(option);
+    setSortDropdown(false)
   };
 
   const handleDetailViewClick = () => {
@@ -51,13 +51,13 @@ const PageContent = ({ leagueName }) => {
             <input
               type="text"
               placeholder="Search..."
-              value={search}
-              onChange={handleSearchChange}
-            /> 
+              value={searchHolder}
+              onChange={(e) => setSearchHolder(e.target.value)}
+            />
             <button onClick={handleSeachClick}>Search</button>
           </div>
           <button onClick={handleSortClick}>Sort
-          {sortClicked && (
+          {sortDropdown && (
             <div className='sort-options'>
               Sort by:
               <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
@@ -69,8 +69,8 @@ const PageContent = ({ leagueName }) => {
           </button>
           <button onClick={handleRefreshClick}>Refresh</button>
         </div>
-
-        <Table sort={sortOption} league={ leagueName } detailed={ detailedView }/>
+        
+        <Table sort={sortOption} league={ leagueName } detailed={ detailedView } search={ search }/>
       </div>
       
       <div> <Footer /> </div>
