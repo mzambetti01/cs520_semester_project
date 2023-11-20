@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Table from './Table';
+import Footer from '../components/Footer';
 import './Page.css'
 
 const PageContent = ({ leagueName }) => {
@@ -43,34 +44,35 @@ const PageContent = ({ leagueName }) => {
   };
 
   return (
-    <>
-    {/* <div>{ leagueName } stuff</div> */}
-    <div>
-      <div className='content-head'>
-        <input
-          type="text"
-          placeholder="Search..."
-          value={filter}
-          onChange={handleFilterChange}
-        /> 
-        <button onClick={handleFilterClick}>Search</button>
-        <button onClick={handleSortClick}>Sort</button>
-        {sortClicked && (
-          <div>
-            Sort by:
-            <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
-            <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
-          </div>
-        )}
-        <button onClick={handleDetailViewClick}>
-          {detailedView ? 'Hide Details' : 'Show Details'}
-        </button>
-        <button onClick={handleRefreshClick}>Refresh</button>
-      </div>
+    <div className='main'>
+      <div className='wrapper'>
+        <div className='content-head'>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={filter}
+            onChange={handleFilterChange}
+          /> 
+          <button onClick={handleFilterClick}>Search</button>
+          <button onClick={handleSortClick}>Sort</button>
+          {sortClicked && (
+            <div>
+              Sort by:
+              <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
+              <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
+            </div>
+          )}
+          <button onClick={handleDetailViewClick}>
+            {detailedView ? 'Hide Details' : 'Show Details'}
+          </button>
+          <button onClick={handleRefreshClick}>Refresh</button>
+        </div>
 
-      <Table sort={sortOption} league={ leagueName } detailed={ detailedView }/>
+        <Table sort={sortOption} league={ leagueName } detailed={ detailedView }/>
+      </div>
+      
+      <div> <Footer /> </div>
     </div>
-    </>
   );
 };
 

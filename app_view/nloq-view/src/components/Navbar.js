@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Navbar.css';
+import './Components.css';
 import logo from '../imgs/nloq-logo-main.png';
 
 const Navbar = () => (

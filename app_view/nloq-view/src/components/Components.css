@@ -71,3 +71,15 @@ li {
 .dropdown-content a:hover {
   background-color: #555;
 }
+
+
+/* Footer.css */
+footer {
+  background-color: #4EA9F3;
+  color: #FCDB7C;
+  text-align: center;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  margin-top: auto;
+}

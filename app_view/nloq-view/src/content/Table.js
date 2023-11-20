@@ -1,5 +1,5 @@
 import React from 'react';
-import './Page.css'
+import './Table.css'
 
 const findColor = (exp_val, max_val, min_val) => {
   // todo: adjust the interpolation so there;s a mid point color

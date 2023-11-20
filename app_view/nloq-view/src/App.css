@@ -6,16 +6,19 @@ body {
 
 .App {
   display: flex;
+  position: relative;
   flex-direction: column;
+  min-height: 100vh;
   height: 100vh; /* Set the height of the entire app to 100% of the viewport height */
 }
 
 .header {
-  flex: 0; /* Make the header non-flexible */
+  flex: 0; 
 }
 
 .body {
   flex: 1; /* Make the body flexible to take up the remaining space */
   overflow-y: auto; /* Enable vertical scrolling */
   padding-top: 70px; /* Make the content start below header */
+  position: relative;
 }

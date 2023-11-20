@@ -1,53 +1,19 @@
 /* Page.css */
-/* styles for the table */
-.table-container {
-    padding-top: 20px;
-    margin: auto;
-    width: 95%;
+.main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.table {
-    margin-top: 15px;
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0px 10px;
-}
-  
-.table th {
-    padding: 10px;
+.wrapper {
+    flex: 1;
+    padding-bottom: 40px;
 }
 
-.table td {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-top: 50px;
-}
-
-td .subrow {
-    width: 100%;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
-  
-/* Table Head Style */
-.table thead {
-    background-color: rgb(188, 209, 32);
-}
-   
-/* Table Body Style */
-.table tbody {
-    /* height: 120px;  */
-    overflow-y: auto;
-}
-  
-/* Individual Table Rows Style */
-.table tbody tr {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 20px;
+.content-head {
+    position: fixed;
 }
 
 /* to-do: styling for buttons */
-.content-head {
-    position: absolute;
-}
+
