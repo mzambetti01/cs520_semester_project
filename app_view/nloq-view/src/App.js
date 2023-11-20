@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './content/Home';
-import LeaguePage from './content/LeaguePage';
+import PageContent from './content/PageContent';
 import Footer from './components/Footer';
 
 function App() {
@@ -16,8 +16,9 @@ function App() {
       </div>
       <div className='body'>
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/nba' element={<LeaguePage leageName="NBA" />} />
+          <Route path='/' element={<PageContent leagueName="" />} />
+          <Route path='/nba' element={<PageContent leagueName="NBA" />} />
+          <Route path='/mlb' element={<PageContent leagueName="MLB" />} />
         </Routes>
       </div>
     </div>

@@ -17,5 +17,5 @@ body {
 .body {
   flex: 1; /* Make the body flexible to take up the remaining space */
   overflow-y: auto; /* Enable vertical scrolling */
-  padding-top: 70px;
+  padding-top: 70px; /* Make the content start below header */
 }

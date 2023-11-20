@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import TableData from './Table';
+import Table from './Table';
 import './Page.css'
 
-const Table = () => {
+const PageContent = ({ leagueName }) => {
   const [filter, setFilter] = useState('');
   const [sortOption, setSortOption] = useState(null);
   const [detailedView, setDetailedView] = useState(false);
@@ -20,6 +20,9 @@ const Table = () => {
   const handleSortClick = () => {
     // Show options for sorting by player name or expected values
     setSortClicked(!sortClicked);
+    if (sortClicked) {
+      setSortOption(null);
+    }
     console.log('Sorting...');
   };
 
@@ -40,29 +43,35 @@ const Table = () => {
   };
 
   return (
+    <>
+    {/* <div>{ leagueName } stuff</div> */}
     <div>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={filter}
-        onChange={handleFilterChange}
-      /> 
-      <button onClick={handleFilterClick}>Search</button>
-      <button onClick={handleSortClick}>Sort</button>
-      {sortClicked && (
-        <div>
-          Sort by:
-          <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
-          <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
-        </div>
-      )}
-      <button onClick={handleDetailViewClick}>
-        {detailedView ? 'Hide Details' : 'Show Details'}
-      </button>
-      <button onClick={handleRefreshClick}>Refresh</button>
-      <TableData filter={filter}/>
+      <div className='content-head'>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={filter}
+          onChange={handleFilterChange}
+        /> 
+        <button onClick={handleFilterClick}>Search</button>
+        <button onClick={handleSortClick}>Sort</button>
+        {sortClicked && (
+          <div>
+            Sort by:
+            <button onClick={() => handleSortOptionClick('name')}>Player Name</button>
+            <button onClick={() => handleSortOptionClick('exp_val')}>Expected Values</button>
+          </div>
+        )}
+        <button onClick={handleDetailViewClick}>
+          {detailedView ? 'Hide Details' : 'Show Details'}
+        </button>
+        <button onClick={handleRefreshClick}>Refresh</button>
+      </div>
+
+      <Table sort={sortOption} league={ leagueName } detailed={ detailedView }/>
     </div>
+    </>
   );
 };
 
-export default Table;
+export default PageContent;
