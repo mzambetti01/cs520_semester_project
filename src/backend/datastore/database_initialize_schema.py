@@ -33,9 +33,10 @@ with conn.cursor() as cur:
             Under FLOAT,
             EventID INT, 
             PlayerID INT, 
+            Market VARCHAR(255),
             CONSTRAINT a FOREIGN KEY (EventID) REFERENCES NLOQ.Events(EventID),
             CONSTRAINT b FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID),
-            CONSTRAINT c primary key(SportsBookID, EventID, PlayerID)
+            CONSTRAINT c primary key(SportsBookID, EventID, PlayerID, Market)
             )
     """
     )
@@ -71,6 +72,7 @@ with conn.cursor() as cur:
         SportsBookName VARCHAR(255),
         EventID INT,
         PlayerID INT,
+        Market VARCHAR(255),
         ExpectedValue FLOAT,
         OverImpliedProb FLOAT,
         UnderImpliedProb FLOAT,
@@ -83,7 +85,7 @@ with conn.cursor() as cur:
         UnderAdjustedOdds FLOAT,
         CONSTRAINT a FOREIGN KEY (EventID) REFERENCES NLOQ.Events(EventID),
         CONSTRAINT c FOREIGN KEY (PlayerID) REFERENCES NLOQ.Players(PlayerID),
-        CONSTRAINT d PRIMARY key(SportsBookID, EventID, PlayerID)
+        CONSTRAINT d PRIMARY key(SportsBookID, EventID, PlayerID, Market)
         )
     """
     )

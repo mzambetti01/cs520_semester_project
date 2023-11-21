@@ -11,7 +11,7 @@ class Bet:
         self.OverOdds = sportsbook_object["Over"]
         self.UnderOdds = sportsbook_object["Under"]
         self.PlayerID = sportsbook_object["PlayerID"]
-
+        self.Market = sportsbook_object["Market"]
         # TODO: Calculate Expected Probability
         self.ExpectedValue = 0
 
@@ -56,7 +56,8 @@ class Bet:
             "OverAdjustedProb": self.OverAdjustedProb,
             "UnderAdjustedProb": self.UnderAdjustedProb,
             "OverAdjustedOdds": self.OverAdjustedOdds,
-            "UnderAdjustedOdds": self.UnderAdjustedOdds
+            "UnderAdjustedOdds": self.UnderAdjustedOdds,
+            "Market" : self.Market
         }
         
         return bet_object

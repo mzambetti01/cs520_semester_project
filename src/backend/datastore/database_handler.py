@@ -86,16 +86,17 @@ class DatabaseHandler():
                     cur.execute(
                         """
                         INSERT INTO NLOQ.SportsbookComparison 
-                        (SportsBookID, SportsBookName, Value, Over, Under, EventID, PlayerID) 
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (SportsBookID, EventID, PlayerID) DO UPDATE
+                        (SportsBookID, SportsBookName, Value, Over, Under, EventID, PlayerID, Market) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID, Market) DO UPDATE
                         SET
                         SportsBookName = EXCLUDED.SportsBookName,
                         Value = EXCLUDED.Value,
                         Over = EXCLUDED.Over,
                         Under = EXCLUDED.Under,
                         EventID = EXCLUDED.EventID,
-                        PlayerID = EXCLUDED.PlayerID;
+                        PlayerID = EXCLUDED.PlayerID,
+                        Market = EXCLUDED.Market;
                         """,
                             (
                             sportsbook_object["SportsBookID"],
@@ -104,7 +105,8 @@ class DatabaseHandler():
                             sportsbook_object["Over"],
                             sportsbook_object["Under"],
                             sportsbook_object["EventID"],
-                            sportsbook_object["PlayerID"]
+                            sportsbook_object["PlayerID"],
+                            sportsbook_object["Market"]
                         )
 
                     )
@@ -186,9 +188,9 @@ class DatabaseHandler():
                         INSERT INTO NLOQ.BetAnalysis 
                         (SportsBookID, SportsBookName, EventID, PlayerID, ExpectedValue,
                         OverImpliedProb, UnderImpliedProb, TotalImpliedProb, Overage, Vigorish,
-                        OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (SportsBookID, EventID, PlayerID) DO NOTHING;
+                        OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds, Market)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID, Market) DO NOTHING;
                         """,
                         (
                             bet_object["SportsBookID"],
@@ -204,7 +206,8 @@ class DatabaseHandler():
                             bet_object["OverAdjustedProb"],
                             bet_object["UnderAdjustedProb"],
                             bet_object["OverAdjustedOdds"],
-                            bet_object["UnderAdjustedOdds"]
+                            bet_object["UnderAdjustedOdds"],
+                            bet_object["Market"]
                         )
                     )
             conn.commit()
@@ -214,10 +217,16 @@ class DatabaseHandler():
         
         return True
     
-    def read_team(self, teamid):
+    def read_team(self, playerid):
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.Teams where teamid = %s", (teamid,))
+                cur.execute("""
+                            SELECT DISTINCT B.*
+                            FROM NLOQ.PLAYERS as A
+                            JOIN NLOQ.TEAMS as B 
+                            ON A.teamID = B.teamID
+                            WHERE A.playerID = %s
+                            """, (playerid,))
                 team = cur.fetchone()
         return team
     
@@ -228,10 +237,26 @@ class DatabaseHandler():
                 events = cur.fetchall()
         return events
 
-    def read_players(self):
+    def read_players(self, sports_league):
+        """_summary_
+
+        Args:
+            sports_league (_type_): _description_
+
+        Returns:
+            dict: json object
+        """
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.Players")
+                cur.execute(
+                    """
+                    SELECT DISTINCT A.PLAYERID, A.PLAYERNAME, A.TEAMID
+                    FROM NLOQ.PLAYERS as A
+                    JOIN NLOQ.SPORTSBOOKCOMPARISON as C ON C.PLAYERID = A.PLAYERID
+                    JOIN NLOQ.EVENTS as B ON B.eventid = C.eventID
+                    WHERE B.eventname = %s 
+                    """, (sports_league,)
+                    )
                 players = cur.fetchall()
         return players
 
@@ -242,10 +267,14 @@ class DatabaseHandler():
                 sportsbooks = cur.fetchall()
         return sportsbooks
 
-    def read_sportbook_analysis(self, eventid, playerid, sportbookid):
+    def read_sportbook_analysis(self, playerid):
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.betanalysis WHERE eventid = %s AND playerid = %s AND sportsbookid = %s ", (eventid,playerid, sportbookid,))
+                cur.execute("""
+                            SELECT B.*
+                            FROM NLOQ.betanalysis as B
+                            WHERE B.playerid = 37022
+                            """, (playerid,))
                 sportsbooks = cur.fetchall()
         return sportsbooks
 
@@ -286,7 +315,7 @@ class DatabaseHandler():
         team_structure = all(key in team_object for key in required_team_keys)
 
         required_keys = [
-            "SportsBookID", "SportsBookName", "Value", "Over", "Under", "EventID", "PlayerID"
+            "SportsBookID", "SportsBookName", "Value", "Over", "Under", "EventID", "PlayerID", "Market"
         ]
         sportsbook_structure = all(key in sportsbook for key in required_keys for sportsbook in sportsbook_list)
 

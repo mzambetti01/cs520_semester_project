@@ -157,6 +157,7 @@ class WebScraper():
                 logging.info(f"Exception when making player object: {e}")
 
             sportbook_objects = []
+            market = response_json['markets'][0]["stat"]
             try: 
                 for book_name, book_object in response_json['markets'][0]['comparison'].items():
                     sportbook_object = {
@@ -166,7 +167,8 @@ class WebScraper():
                         "Over" : book_object["over"],
                         "Under": book_object["under"],
                         "EventID": eventID,
-                        "PlayerID": player_final_object["PlayerID"]
+                        "PlayerID": player_final_object["PlayerID"],
+                        "Market" : market
                     }
                     sportbook_objects.append(sportbook_object)
             except Exception as e:

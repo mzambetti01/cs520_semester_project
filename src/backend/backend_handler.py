@@ -20,15 +20,36 @@ app = Flask(__name__)
 # Endpoint to get a list of players in a league
 @app.route('/players/<string:sports_league>', methods=['GET'])
 def get_players(sports_league):
+    """
+
+    Args:
+        sports_league (_type_): _description_
+
+    Returns:
+        dict{{str, list[dict]}, error_message:int}: 
+    """
     update_database()
+
+    try:
+        response = database_handler.read_players(sports_league)
+        return {"response_object": response}, 200
+    except Exception as e:
+        return {"Error Message": "{e}"}, 501
     #database_handler.read_players()
-    return {"Error" : "Not Implemented"}, 501
+    #return {"Error" : "Not Implemented"}, 501
 
 # Endpoint to get team info based on a player ID
 @app.route('/team_info/<int:player_id>', methods=['GET'])
 def get_team_info(player_id):
-  logging.info("team info accessed")
-  return {"Error" : "Not Implemented"}, 501
+    logging.info("team info accessed")
+    update_database()
+
+    try:
+        response = database_handler.read_team(player_id)
+        return {"response_object": response}, 200
+    except Exception as e:
+        return {"Error Message": "{e}"}, 501
+    #return {"Error" : "Not Implemented"}, 501
 
 # Endpoint to get a list of markets for a league
 @app.route('/markets/<string:sports_league>', methods=['GET'])
@@ -63,8 +84,33 @@ def get_sports_leagues():
 # Endpoint to get sports betting data for a given player
 @app.route('/player_betting_data/<int:player_id>', methods=['GET'])
 def get_player_betting_data(player_id):
-    #logging.info("5")
-    return {"Error" : "Not Implemented"}, 501
+    logging.info("team info accessed")
+    update_database()
+
+    try:
+        response = database_handler.read_sportbook_analysis(player_id)
+        return {"response_object": response}, 200
+    except Exception as e:
+        return {"Error Message": "{e}"}, 501
+    #return {"Error" : "Not Implemented"}, 501
+
+# TODO updatebase 
+# Endpoint to get sports betting data for a given player
+@app.route('/update/<player_name>/<int:eventID>/<market>/<event>', methods=['GET'])
+def update_player(player_name, eventID, market, event):
+    try:
+        player_object = {
+            'player_name' : player_name,
+            'eventID' : eventID,
+            'EVENT' : event,
+            "market" : market
+        }
+        process_player(player_object) 
+        return {"response_object": "done"}, 200
+    except Exception as e:
+        return {"Error Message": f"{e}"}, 501
+    
+
 
 def update_database():
     if database_ttl():
@@ -78,21 +124,23 @@ def update_database():
                 for market in markets:
                     player_list = webscraper.get_player_list(league, market)
 
-                    
-                    for player in player_list:
-                        thread = threading.Thread(target=process_player, args=(player,))
-                        threads.append(thread)
-                        thread.start()
+                    if player_list is not None:
+                        for player in player_list:
+                            thread = threading.Thread(target=process_player, args=(player,))
+                            threads.append(thread)
+                            thread.start()  
 
                                 # Wait for all threads to finish
-                for thread in threads:
+                
+                for i, thread in enumerate(threads):
+                    logging.info(f"Waiting for {i}/{len(threads)} to finish inserting")
                     thread.join()
 
 
-                        #player_object, team_object, sportsbook_objects, event_object = webscraper.get_player_odds(player)
-                        #time.sleep(.1)
-                        #database_handler.insert_scrapering_data(player_object, event_object, team_object, sportsbook_objects)
+        logging.info("Updating table")
         update_last_update()
+    
+
 
 def process_player(player):
     player_object, team_object, sportsbook_objects, event_object = webscraper.get_player_odds(player)
@@ -111,6 +159,7 @@ def update_last_update():
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=2)
 
+    logging.info("updated log")
 
 def database_ttl():
     file_path = "webscraper_metadata.json"
@@ -128,7 +177,7 @@ def database_ttl():
     time_difference = datetime.now() - last_update_datetime
     
     # Check if the time difference is more than an hour
-    if time_difference > timedelta(hours=1):
+    if time_difference > timedelta(hours=6):
         return True
     else:
         return False
