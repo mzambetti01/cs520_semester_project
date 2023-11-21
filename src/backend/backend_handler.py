@@ -41,6 +41,14 @@ def get_players(sports_league):
 # Endpoint to get team info based on a player ID
 @app.route('/team_info/<int:player_id>', methods=['GET'])
 def get_team_info(player_id):
+    """ Get the team info of a certain player
+
+    Args:
+        player_id (int): Player Primary Key
+
+    Returns:
+        dict: response object and status code
+    """
     logging.info("team info accessed")
     update_database()
 
@@ -49,13 +57,20 @@ def get_team_info(player_id):
         return {"response_object": response}, 200
     except Exception as e:
         return {"Error Message": "{e}"}, 501
-    #return {"Error" : "Not Implemented"}, 501
 
-# Endpoint to get a list of markets for a league
 @app.route('/markets/<string:sports_league>', methods=['GET'])
 def get_markets(sports_league):
+    """
+    Endpoint to get a list of markets for a league
 
-    with open('webscraper_metadata.json') as file:
+    Args:
+        sports_league (string): nhl, nba, or nfl
+
+    Returns:
+        dict: response object
+    """
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webscraper_metadata.json")
+    with open(file_path) as file:
         data = json.load(file)
 
     # Extract all keys into a list
@@ -68,11 +83,16 @@ def get_markets(sports_league):
 
     return {"markets": markets}, 200
 
-# Endpoint to get a list of sports leagues
+# 
 @app.route('/sports_leagues', methods=['GET'])
 def get_sports_leagues():
-    
-    with open('webscraper_metadata.json') as file:
+    """Endpoint to get a list of sports leagues
+
+    Returns:
+        dict: response object with list of currently available sport leagues
+    """
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webscraper_metadata.json")
+    with open(file_path) as file:
         data = json.load(file)
 
     # Extract all keys into a list
@@ -81,9 +101,18 @@ def get_sports_leagues():
 
     return {"leagues" : keys_list} , 200
 
-# Endpoint to get sports betting data for a given player
+
 @app.route('/player_betting_data/<int:player_id>', methods=['GET'])
 def get_player_betting_data(player_id):
+    """Endpoint to get sports betting data for a given player
+
+    Args:
+        player_id (int): Player Primary Key
+
+    Returns:
+        dict: response object containing a list of sports betting data
+          for all markets from all sports betting websites 
+    """
     logging.info("team info accessed")
     update_database()
 
@@ -92,19 +121,29 @@ def get_player_betting_data(player_id):
         return {"response_object": response}, 200
     except Exception as e:
         return {"Error Message": "{e}"}, 501
-    #return {"Error" : "Not Implemented"}, 501
+   
 
-# TODO updatebase 
-# Endpoint to get sports betting data for a given player
-@app.route('/update/<player_name>/<int:eventID>/<market>/<event>', methods=['GET'])
+@app.route('/update/<player_name>/<int:eventID>/<string:market>/<string:event>', methods=['GET'])
 def update_player(player_name, eventID, market, event):
+    """ Endpoint to get sports betting data for a given player
+
+    Args:
+        player_name (string): Player Name ex: Nikita%20Kucherov or Nikita Kucherov
+        eventID (int): Primary Event ID Key, ex: 20855
+        market (string): betting market, ex: points
+        event (string): Sports league, ex: nhl
+
+    Returns:
+        dict: status code 200 for success, 501 otherwise
+    """
     try:
         player_object = {
-            'player_name' : player_name,
+            'player_name' : player_name.replace(' ', '%20'),
             'eventID' : eventID,
             'EVENT' : event,
             "market" : market
         }
+        print(player_object)
         process_player(player_object) 
         return {"response_object": "done"}, 200
     except Exception as e:
@@ -113,10 +152,14 @@ def update_player(player_name, eventID, market, event):
 
 
 def update_database():
+    """
+    Clear the stale database and get new info inserted
+    """
     if database_ttl():
         database_handler.reset_database()
         logging.info("Updating Database with latest data")
-        with open('webscraper_metadata.json') as file:
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webscraper_metadata.json")
+        with open(file_path) as file:
             data = json.load(file)
 
             for league, markets in data[0].items():
@@ -143,12 +186,25 @@ def update_database():
 
 
 def process_player(player):
+    """ Helper function for update database
+
+    Args:
+        player (dict):
+        
+        structure:
+           player_object = {
+            'player_name':string : player_name.replace(' ', '%20'),
+            'eventID':int : eventID,
+            'EVENT':string : event,
+            "market":string : market
+        }
+    """
     player_object, team_object, sportsbook_objects, event_object = webscraper.get_player_odds(player)
     time.sleep(0.1)
     database_handler.insert_scrapering_data(player_object, event_object, team_object, sportsbook_objects)
 
 def update_last_update():
-    file_path = "webscraper_metadata.json"
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webscraper_metadata.json")
 
     with open(file_path, 'r') as file:
         data = json.load(file)
@@ -162,7 +218,7 @@ def update_last_update():
     logging.info("updated log")
 
 def database_ttl():
-    file_path = "webscraper_metadata.json"
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webscraper_metadata.json")
     
     with open(file_path, 'r') as file:
         data = json.load(file)

@@ -273,7 +273,7 @@ class DatabaseHandler():
                 cur.execute("""
                             SELECT B.*
                             FROM NLOQ.betanalysis as B
-                            WHERE B.playerid = 37022
+                            WHERE B.playerid = %s
                             """, (playerid,))
                 sportsbooks = cur.fetchall()
         return sportsbooks

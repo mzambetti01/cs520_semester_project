@@ -9,7 +9,8 @@ def testNormalBet():
         "Over": -125,
         "Under": 115,
         "EventID": "20855",
-        "PlayerID": 17181
+        "PlayerID": 17181,
+        "Market": "points"
     }
     bet = Bet(bet_object)
     #bet = Bet("Barstool", "Matt Zambetti Saves", 3.5, -125, 115)

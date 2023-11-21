@@ -6,6 +6,7 @@
         "Over": -125,
         "Under": -105,
         "EventID": "20855",
+        "Market" : "points",
         "PlayerID": 17181
     },
     {
@@ -14,6 +15,7 @@
         "Value": 1.5,
         "Over": -140,
         "Under": 105,
+        "Market" : "points",
         "EventID": "20855",
         "PlayerID": 17181
     },
@@ -23,6 +25,7 @@
         "Value": 1.5,
         "Over": -125,
         "Under": -105,
+        "Market" : "points",
         "EventID": "20855",
         "PlayerID": 17181
     },
@@ -31,6 +34,7 @@
         "SportsBookName": "prizepicks",
         "Value": 1.5,
         "Over": null,
+        "Market" : "points",
         "Under": null,
         "EventID": "20855",
         "PlayerID": 17181
