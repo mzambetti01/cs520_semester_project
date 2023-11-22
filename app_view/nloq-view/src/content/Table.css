@@ -1,0 +1,63 @@
+/* styles for the table */
+.table-container {
+    padding-top: 20px;
+    margin: auto;
+    width: 95%;
+}
+
+.table {
+    margin-top: 15px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0px 10px;
+}
+  
+.table th {
+    padding: 10px;
+}
+
+.table td {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 1px solid #f3f3f3;
+    border-top: 50px;
+}
+
+td .subrow {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #f3f3f3;
+}
+  
+/* Table Head Style */
+.table thead {
+    background-color: #75bcf6;
+}
+   
+/* Table Body Style */
+.table tbody {
+    /* height: 120px;  */
+    overflow-y: auto;
+}
+  
+/* Individual Table Rows Style */
+.table tbody tr {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.table tbody tr.highlighted {
+    box-shadow: 0 0 3px 3px #FCDB7C;
+    animation: glow 0.5s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 3px 3px #FCDB7C;
+    }
+    to {
+        box-shadow: 0 0 5px 5px #FCDB7C;
+    }
+}

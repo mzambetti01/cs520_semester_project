@@ -1,8 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Navbar from './components/Navbar';
-import NBA from './pages/Nba';
-import Home from './pages/Home';
+import PageContent from './content/PageContent';
 
 function App() {
   return (
@@ -10,12 +9,16 @@ function App() {
     <div className="App">
       <div className='header'>
         <Navbar />
-        <h1 className='name'>NLOQ</h1>
       </div>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/nba' element={<NBA />} />
-      </Routes>
+      <div className='body'>
+        <Routes>
+          <Route path='/' element={<PageContent leagueName="" />} />
+          <Route path='/nba' element={<PageContent leagueName="NBA" />} />
+          <Route path='/mlb' element={<PageContent leagueName="MLB" />} />
+          <Route path='/nfl' element={<PageContent leagueName="NFL" />} />
+          <Route path='/ncaaf' element={<PageContent leagueName="NCAAF" />} />
+        </Routes>
+      </div>
     </div>
     </Router>
   );
