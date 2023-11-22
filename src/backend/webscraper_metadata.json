@@ -1,0 +1,35 @@
+[
+  {
+    "nba": [
+      "points",
+      "rebounds",
+      "assists",
+      "blocks",
+      "steals",
+      "3 pointers",
+      "points & rebounds",
+      "points & assists",
+      "points, rebounds, & assists"
+    ],
+    "nhl": [
+      "goals",
+      "shots on goal",
+      "assists",
+      "points",
+      "blocked shots"
+    ],
+    "nfl": [
+      "passing yards",
+      "rushing yards",
+      "receiving yards",
+      "receptions",
+      "touchdowns",
+      "passing tds",
+      "completions",
+      "interceptions"
+    ]
+  },
+  {
+    "last_update": "2023-11-21 10:35:44"
+  }
+]

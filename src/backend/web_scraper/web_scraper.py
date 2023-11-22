@@ -26,7 +26,7 @@ class WebScraper():
         player_list = []
 
         # prep market string:
-        market = market.replace(' ','%20')
+        market = market.replace(' ', '%20').replace(',', '%26')
 
         # prep event string
         EVENT = EVENT.lower()
@@ -107,57 +107,76 @@ class WebScraper():
 
             raw_team = response_json['event']['home']
 
-            team_object = {
-                "TeamID" : raw_team["id"],
-                "City" : raw_team["city"],
-                "TeamName" : raw_team['mascot'],
-                "Conference" : raw_team['conference'],
-                "Division" : raw_team['division'],
-                "PointsPerGame" : raw_team['scoring']['ppg'],
-                "OpponentPointsPerGame" : raw_team['scoring']['oppg'],
-                "Wins" : raw_team['records']['moneyline']['wins'],
-                "Losses" : raw_team['records']['moneyline']['losses'],
-                "Ties" : raw_team['records']['moneyline']['ties'],
-                "MoneylineWins" : raw_team['records']['moneyline']['wins'],
-                "MoneylineLosses" : raw_team['records']['moneyline']['losses'],
-                "MoneylineTies" : raw_team['records']['moneyline']['ties'],
-                "SpreadWins" : raw_team['records']['spread']['wins'],
-                "SpreadLosses" : raw_team['records']['spread']['losses'],
-                "SpreadTies" : raw_team['records']['spread']['ties'],
-                "TotalWins" : raw_team['records']['total']['wins'],
-                "TotalLosses" : raw_team['records']['total']['losses'],
-                "TotalTies" : raw_team['records']['total']['ties'],
-            } 
+            team_object = None
+            try:
+                team_object = {
+                    "TeamID" : raw_team["id"],
+                    "City" : raw_team["city"],
+                    "TeamName" : raw_team['mascot'],
+                    "Conference" : raw_team['conference'],
+                    "Division" : raw_team['division'],
+                    "PointsPerGame" : raw_team['scoring']['ppg'],
+                    "OpponentPointsPerGame" : raw_team['scoring']['oppg'],
+                    "Wins" : raw_team['records']['moneyline']['wins'],
+                    "Losses" : raw_team['records']['moneyline']['losses'],
+                    "Ties" : raw_team['records']['moneyline']['ties'],
+                    "MoneylineWins" : raw_team['records']['moneyline']['wins'],
+                    "MoneylineLosses" : raw_team['records']['moneyline']['losses'],
+                    "MoneylineTies" : raw_team['records']['moneyline']['ties'],
+                    "SpreadWins" : raw_team['records']['spread']['wins'],
+                    "SpreadLosses" : raw_team['records']['spread']['losses'],
+                    "SpreadTies" : raw_team['records']['spread']['ties'],
+                    "TotalWins" : raw_team['records']['total']['wins'],
+                    "TotalLosses" : raw_team['records']['total']['losses'],
+                    "TotalTies" : raw_team['records']['total']['ties'],
+                } 
+            except Exception as e:
+                logging.info(f"Exception when reading team object: {e}")
 
-            event_object ={
-                "eventid" : player_object["eventID"],
-                "eventname" :  player_object["EVENT"],
-                "market" : player_object["market"]
-            }
+            event_object = None
+            try:
+                event_object ={
+                    "eventid" : player_object["eventID"],
+                    "eventname" :  player_object["EVENT"],
+                    "market" : player_object["market"]
+                }
+            except Exception as e:
+                logging.info(f"Exception when reading event object: {e}")
 
-            player_final_object = {
-                "PlayerID": response_json['markets'][0]['player']['id'],
-                "PlayerName" : player_name,
-                "TeamID": raw_team["id"]
-            }
+
+            #logging.info(response_json)
+            
+            player_final_object = None
+            try:
+                player_final_object = {
+                    "PlayerID": response_json['markets'][0]['player']['id'],
+                    "PlayerName" : player_name,
+                    "TeamID": raw_team["id"]
+                }
+            except Exception as e:
+                logging.info(f"Exception when making player object: {e}")
 
             sportbook_objects = []
-            
-            for book_name, book_object in response_json['markets'][0]['comparison'].items():
-                sportbook_object = {
-                    "SportsBookID" : book_object["sportsbook"],
-                    "SportsBookName" : book_name, 
-                    "Value": book_object["value"],
-                    "Over" : book_object["over"],
-                    "Under": book_object["under"],
-                    "EventID": eventID,
-                    "PlayerID": player_final_object["PlayerID"]
-                }
-                sportbook_objects.append(sportbook_object)
-
+            market = response_json['markets'][0]["stat"]
+            try: 
+                for book_name, book_object in response_json['markets'][0]['comparison'].items():
+                    sportbook_object = {
+                        "SportsBookID" : book_object["sportsbook"],
+                        "SportsBookName" : book_name, 
+                        "Value": book_object["value"],
+                        "Over" : book_object["over"],
+                        "Under": book_object["under"],
+                        "EventID": eventID,
+                        "PlayerID": player_final_object["PlayerID"],
+                        "Market" : market
+                    }
+                    sportbook_objects.append(sportbook_object)
+            except Exception as e:
+                logging.info(f"Exception when making sportsbook object: {e}")
             
         return player_final_object, team_object, sportbook_objects, event_object
         
+"""
 logging.basicConfig(level=logging.INFO)
 
 scraper = WebScraper()
@@ -182,8 +201,8 @@ with open('player_object.json', 'w') as json_file:
 
 with open('event_object.json', 'w') as json_file:
     json_file.truncate()
-    json.dump(event_object, json_file)
+    json.dump(event_object, json_file)  
 
-
+"""
 
 

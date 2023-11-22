@@ -1,7 +1,9 @@
 import psycopg2
 import logging
 import os 
+import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+sys.path.insert(0, project_root)
 from src.backend.data_analysis.bet import Bet
 
 class DatabaseHandler():
@@ -51,7 +53,7 @@ class DatabaseHandler():
                             print(f"Event with ID {event_id} already exists in the table. Skipping insertion.")
                     conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion eventid: {e}")
             return False
         
         return True
@@ -61,14 +63,18 @@ class DatabaseHandler():
             with psycopg2.connect(self.DATABASE_URL) as conn:
                 with conn.cursor() as cur:
                     cur.execute(
-                        "INSERT INTO NLOQ.Players (PlayerID, PlayerName, TeamID) VALUES (%s, %s, %s)",
+                        """ 
+                        INSERT INTO NLOQ.Players (PlayerID, PlayerName, TeamID) VALUES (%s, %s, %s)
+                        ON CONFLICT (PlayerID) DO UPDATE
+                        SET PlayerName = EXCLUDED.PlayerName, TeamID = EXCLUDED.TeamID
+                        """,
                         (player_object["PlayerID"],
                         player_object["PlayerName"],
                         player_object["TeamID"])
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of player_object: {e}")
             return False
         
         return True
@@ -80,8 +86,17 @@ class DatabaseHandler():
                     cur.execute(
                         """
                         INSERT INTO NLOQ.SportsbookComparison 
-                        (SportsBookID, SportsBookName, Value, Over, Under, EventID, PlayerID) 
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        (SportsBookID, SportsBookName, Value, Over, Under, EventID, PlayerID, Market) 
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID, Market) DO UPDATE
+                        SET
+                        SportsBookName = EXCLUDED.SportsBookName,
+                        Value = EXCLUDED.Value,
+                        Over = EXCLUDED.Over,
+                        Under = EXCLUDED.Under,
+                        EventID = EXCLUDED.EventID,
+                        PlayerID = EXCLUDED.PlayerID,
+                        Market = EXCLUDED.Market;
                         """,
                             (
                             sportsbook_object["SportsBookID"],
@@ -90,13 +105,14 @@ class DatabaseHandler():
                             sportsbook_object["Over"],
                             sportsbook_object["Under"],
                             sportsbook_object["EventID"],
-                            sportsbook_object["PlayerID"]
+                            sportsbook_object["PlayerID"],
+                            sportsbook_object["Market"]
                         )
 
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of sportsbook object: {e}")
             return False
         
         return True
@@ -113,6 +129,26 @@ class DatabaseHandler():
                         MoneylineLosses, MoneylineTies, SpreadWins, SpreadLosses, 
                         SpreadTies, TotalWins, TotalLosses, TotalTies)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (TeamID) DO UPDATE
+                        SET
+                        City = EXCLUDED.City,
+                        TeamName = EXCLUDED.TeamName,
+                        Conference = EXCLUDED.Conference,
+                        Division = EXCLUDED.Division,
+                        PointsPerGame = EXCLUDED.PointsPerGame,
+                        OpponentPointsPerGame = EXCLUDED.OpponentPointsPerGame,
+                        Wins = EXCLUDED.Wins,
+                        Losses = EXCLUDED.Losses,
+                        Ties = EXCLUDED.Ties,
+                        MoneylineWins = EXCLUDED.MoneylineWins,
+                        MoneylineLosses = EXCLUDED.MoneylineLosses,
+                        MoneylineTies = EXCLUDED.MoneylineTies,
+                        SpreadWins = EXCLUDED.SpreadWins,
+                        SpreadLosses = EXCLUDED.SpreadLosses,
+                        SpreadTies = EXCLUDED.SpreadTies,
+                        TotalWins = EXCLUDED.TotalWins,
+                        TotalLosses = EXCLUDED.TotalLosses,
+                        TotalTies = EXCLUDED.TotalTies;
                         """,
                         (
                             team_object["TeamID"],
@@ -138,7 +174,7 @@ class DatabaseHandler():
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of team object: {e}")
             return False
         
         return True
@@ -152,8 +188,9 @@ class DatabaseHandler():
                         INSERT INTO NLOQ.BetAnalysis 
                         (SportsBookID, SportsBookName, EventID, PlayerID, ExpectedValue,
                         OverImpliedProb, UnderImpliedProb, TotalImpliedProb, Overage, Vigorish,
-                        OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        OverAdjustedProb, UnderAdjustedProb, OverAdjustedOdds, UnderAdjustedOdds, Market)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (SportsBookID, EventID, PlayerID, Market) DO NOTHING;
                         """,
                         (
                             bet_object["SportsBookID"],
@@ -169,20 +206,27 @@ class DatabaseHandler():
                             bet_object["OverAdjustedProb"],
                             bet_object["UnderAdjustedProb"],
                             bet_object["OverAdjustedOdds"],
-                            bet_object["UnderAdjustedOdds"]
+                            bet_object["UnderAdjustedOdds"],
+                            bet_object["Market"]
                         )
                     )
             conn.commit()
         except Exception as e:
-            logging.info(f"Exception during insertion: {e}")
+            logging.info(f"Exception during insertion of sports bet: {e}")
             return False
         
         return True
     
-    def read_team(self, teamid):
+    def read_team(self, playerid):
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.Teams where teamid = %s", (teamid,))
+                cur.execute("""
+                            SELECT DISTINCT B.*
+                            FROM NLOQ.PLAYERS as A
+                            JOIN NLOQ.TEAMS as B 
+                            ON A.teamID = B.teamID
+                            WHERE A.playerID = %s
+                            """, (playerid,))
                 team = cur.fetchone()
         return team
     
@@ -193,10 +237,26 @@ class DatabaseHandler():
                 events = cur.fetchall()
         return events
 
-    def read_players(self):
+    def read_players(self, sports_league):
+        """_summary_
+
+        Args:
+            sports_league (_type_): _description_
+
+        Returns:
+            dict: json object
+        """
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.Players")
+                cur.execute(
+                    """
+                    SELECT DISTINCT A.PLAYERID, A.PLAYERNAME, A.TEAMID
+                    FROM NLOQ.PLAYERS as A
+                    JOIN NLOQ.SPORTSBOOKCOMPARISON as C ON C.PLAYERID = A.PLAYERID
+                    JOIN NLOQ.EVENTS as B ON B.eventid = C.eventID
+                    WHERE B.eventname = %s 
+                    """, (sports_league,)
+                    )
                 players = cur.fetchall()
         return players
 
@@ -207,10 +267,14 @@ class DatabaseHandler():
                 sportsbooks = cur.fetchall()
         return sportsbooks
 
-    def read_sportbook_analysis(self, eventid, playerid, sportbookid):
+    def read_sportbook_analysis(self, playerid):
         with psycopg2.connect(self.DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT * FROM NLOQ.betanalysis WHERE eventid = %s AND playerid = %s AND sportsbookid = %s ", (eventid,playerid, sportbookid,))
+                cur.execute("""
+                            SELECT B.*
+                            FROM NLOQ.betanalysis as B
+                            WHERE B.playerid = %s
+                            """, (playerid,))
                 sportsbooks = cur.fetchall()
         return sportsbooks
 
@@ -251,7 +315,7 @@ class DatabaseHandler():
         team_structure = all(key in team_object for key in required_team_keys)
 
         required_keys = [
-            "SportsBookID", "SportsBookName", "Value", "Over", "Under", "EventID", "PlayerID"
+            "SportsBookID", "SportsBookName", "Value", "Over", "Under", "EventID", "PlayerID", "Market"
         ]
         sportsbook_structure = all(key in sportsbook for key in required_keys for sportsbook in sportsbook_list)
 
