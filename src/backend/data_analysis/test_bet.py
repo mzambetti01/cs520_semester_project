@@ -30,7 +30,7 @@ def testNormalBet():
 
     # Checking Adjusted Probs
     # Side 1: 54.43, Side 2: 45.57
-    adjusted_probs = ((round(bet.OverImpliedProb, 4)==.5443) and (round(bet.UnderImpliedProb, 4)==.4557))
+    adjusted_probs = ((round(bet.OverAdjustedProb, 4)==.5443) and (round(bet.UnderAdjustedProb, 4)==.4557))
     print("Adjusted Probability is correct:", adjusted_probs)
 
     # Checking Adjusted Odds
@@ -40,7 +40,7 @@ def testNormalBet():
 
 
 
-# Testing when both sides of the bet are negative
+# Testing when both sides of the bet are negativ-12e
 def testDoubleNegative():
     pass
 

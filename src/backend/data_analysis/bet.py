@@ -12,8 +12,6 @@ class Bet:
         self.UnderOdds = sportsbook_object["Under"]
         self.PlayerID = sportsbook_object["PlayerID"]
         self.Market = sportsbook_object["Market"]
-        # TODO: Calculate Expected Probability
-        self.ExpectedValue = 0
 
         # Calculating Implied Probabbility
         self.OverImpliedProb = Bet.calculate_implied_probability(self.OverOdds)
@@ -32,9 +30,16 @@ class Bet:
         # Making sure our adjusted odds are in valid ranges
         self.check_adj_odds()
 
-        #self.ev1 = self.calculate_ev(self.odds1, self.adj_odds1, self.UnderAdjustedProb)
-        #self.ev2 = self.calculate_ev(self.odds2, self.adj_odds2, self.adj_prob2)
+        # Calculating Expected Value with true odds
+        # over_odds, under_odds, over_true_prob, under_true_prob
+        self.OverExpectedValue, self.UnderExpectedValue = Bet.calculate_ev(self.OverOdds, self.UnderOdds, self.OverAdjustedProb, self.UnderAdjustedProb)
         
+        #print("Under Odds:", self.UnderOdds, self.UnderAdjustedOdds)
+        #print("Over Odds:", self.OverOdds, self.OverAdjustedOdds)
+
+        # (vig_odds-zero_vig_odds)*win_percent)
+        #print((self.OverOdds-self.OverAdjustedOdds)*self.OverAdjustedProb)
+        #print((self.UnderOdds-self.UnderAdjustedOdds)*self.UnderAdjustedProb)
 
     def get_bet_object(self):
         """Create a return object for the database
@@ -114,10 +119,34 @@ class Bet:
             return ((100*(1-prob))/prob)
         else:
             return (-1*(prob*100)/(prob-1))
-        
+    
+    # Calculating the return of a single bet
+    def calculate_profit(odds, stake):
+
+        # For favorites
+        if (odds < 0):
+            return ((100/-odds)*stake)
+        # For underdogs
+        if (odds > 0):
+            return ((odds/100)*stake)
+
+
     # Function to calculate expected value using vig and 0-vig odds
-    def calculate_ev(vig_odds, zero_vig_odds, win_percent):
-        return ((vig_odds-zero_vig_odds)*win_percent)
+    def calculate_ev(over_odds, under_odds, over_true_prob, under_true_prob):
+        over_profit = Bet.calculate_profit(over_odds, 100)
+        under_profit = Bet.calculate_profit(under_odds, 100)
+
+        print(over_profit)
+        print(under_profit)
+
+
+        over_ev = (over_profit * over_true_prob) - (100 * under_true_prob)
+        under_ev = (under_profit * under_true_prob) - (100 * over_true_prob)
+        
+        return over_ev, under_ev
+        # Other form of EV not being used
+        #return ((vig_odds-zero_vig_odds)*win_percent)s
+    
   
     # To string Function
     def to_string(self):
