@@ -32,7 +32,7 @@ class Bet:
 
         # Calculating Expected Value with true odds
         # over_odds, under_odds, over_true_prob, under_true_prob
-        self.OverExpectedValue, self.UnderExpectedValue = Bet.calculate_ev(self.OverOdds, self.UnderOdds, self.OverAdjustedProb, self.UnderAdjustedProb)
+        self.ExpectedValue = Bet.calculate_ev(self.OverOdds, self.UnderOdds, self.OverAdjustedProb, self.UnderAdjustedProb)
         
         #print("Under Odds:", self.UnderOdds, self.UnderAdjustedOdds)
         #print("Over Odds:", self.OverOdds, self.OverAdjustedOdds)
@@ -143,7 +143,8 @@ class Bet:
         over_ev = (over_profit * over_true_prob) - (100 * under_true_prob)
         under_ev = (under_profit * under_true_prob) - (100 * over_true_prob)
         
-        return over_ev, under_ev
+        # Assuming both are the same...
+        return over_ev
         # Other form of EV not being used
         #return ((vig_odds-zero_vig_odds)*win_percent)s
     
