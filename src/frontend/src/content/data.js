@@ -4,22 +4,33 @@ import React, { useState, useEffect } from 'react';
 const useProcessData = ({ league }) => {
   const [playerIdData, setPlayerIdData] = useState([]);
   const [betData, setBetData] = useState([]);
+  const allLeagues = ["nba", "nhl", "nfl"]
 
   useEffect(() => {
     const fetchPlayerID = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/players/${league}`);
+        let url;
+        if (league.trim() === '') {
+          // Fetch data for all leagues
+          const leagueQueryString = allLeagues.map(l => `league=${encodeURIComponent(l)}`).join('&');
+          url = `http://localhost:5000/players?${leagueQueryString}`;
+        } else {
+          // Fetch data for a specific league
+          url = `http://localhost:5000/players/${encodeURIComponent(league)}`;
+        }
+  
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
+  
         const data = await response.json();
         setPlayerIdData(data.response_object);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+  
     fetchPlayerID();
   }, [league]);
 
@@ -29,10 +40,10 @@ const useProcessData = ({ league }) => {
     const fetchBetData = async () => {
       try {
         const betDataPromises = players.map(async (playerId) => {
-          const response = await fetch(`http://localhost:5000/player_betting_data/${playerId}`);
+          const response = await fetch(`http://localhost:5000/player_betting_data/${encodeURIComponent(playerId)}`);
           
           if (!response.ok) {
-            throw new Error(`Network response was not ok for PlayerID ${playerId}`);
+            throw new Error(`Network response was not ok for PlayerID ${encodeURIComponent(playerId)}`);
           }
   
           const data = await response.json();
