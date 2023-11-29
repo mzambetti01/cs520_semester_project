@@ -44,17 +44,16 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
   // grabbing real data
   let tableData = useProcessData(league);
 
-
   // Filtering 
   // let tableData = data.filter(
   //   (item) =>
   //     league === "" || item.league.toLowerCase() === league.toLowerCase()
   // );
 
-  const max_val = tableData.reduce((acc, x) => acc >= x.exp_val ? acc : x.exp_val, -1);
-  const min_val = tableData.reduce((acc, x) => acc <= x.exp_val ? acc : x.exp_val, 1);
+  const max_val = tableData.reduce((acc, x) => acc >= x.ExpenctedValue ? acc : x.ExpenctedValue, -1);
+  const min_val = tableData.reduce((acc, x) => acc <= x.ExpenctedValue ? acc : x.ExpenctedValue, 1);
 
-  tableData = tableData.slice().sort((a, b) => b.exp_val - a.exp_val);
+  tableData = tableData.slice().sort((a, b) => b.ExpenctedValue - a.ExpenctedValue);
 
   // if sort specified, sort by specified thing first
   console.log(sort)
@@ -63,8 +62,7 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
   // if searched, set highlight to true
   tableData = tableData.map((item) => ({
     ...item,
-      highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase()) ||
-                   item.prop_type.toLowerCase().includes(search.toLowerCase())
+      highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase())
   }));
   let match = tableData.reduce((acc, x) => acc || x.highlighted, false)
   setMatched(match)
@@ -75,8 +73,8 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
       <thead>
         <tr>
           <th>Player</th>
-          <th>Prop Type</th>
-          {detailed && <th>Odds</th>}
+          {/* <th>Prop Type</th> */}
+          {detailed && <th>Implied Prob</th>}
           {detailed && <th>Adjusted Prob</th>}
           {detailed && <th>Adjusted Odds</th>}
           <th>Expected Value</th>
@@ -84,24 +82,24 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
       </thead>
       <tbody>
         {tableData.map((item) => (
-          <tr key={item.id} 
+          <tr key={item.PlayerID} 
               style={{backgroundColor:findColor(item.exp_val, max_val, min_val)}} 
               className={item.highlighted ? 'highlighted' : ''}>
-            <td>{item.name}</td>
-            <td>{item.prop_type}</td>
+            <td>{item.PlayerName}</td>
+            {/* <td>{item.prop_type}</td> */}
             {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
+              <div className='subrow'> {item.OverImpliedProb} </div>
+              <div style={{textAlign: "center"}}> {item.UnderImpliedProb} </div> 
             </td>}
             {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
+              <div className='subrow'> {item.OverAdjustedProb} </div>
+              <div style={{textAlign: "center"}}> {item.UnderAdjustedProb} </div> 
             </td>}
             {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
+              <div className='subrow'> {item.OverAdjustedOdds} </div>
+              <div style={{textAlign: "center"}}> {item.UnderAdjustedOdds} </div> 
             </td>}
-            <td>{item.exp_val}</td>
+            <td>{item.ExpectedValue}</td>
           </tr>
         ))}
       </tbody>

@@ -14,9 +14,8 @@ function App() {
         <Routes>
           <Route path='/' element={<PageContent leagueName="" />} />
           <Route path='/nba' element={<PageContent leagueName="NBA" />} />
-          <Route path='/mlb' element={<PageContent leagueName="MLB" />} />
           <Route path='/nfl' element={<PageContent leagueName="NFL" />} />
-          <Route path='/ncaaf' element={<PageContent leagueName="NCAAF" />} />
+          <Route path='/nhl' element={<PageContent leagueName="NHL" />} />
         </Routes>
       </div>
     </div>

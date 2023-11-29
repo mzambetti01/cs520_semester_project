@@ -69,7 +69,7 @@ const useProcessData = ({ league }) => {
 
   finalData = finalData.map(x => {
     return Object.fromEntries(
-      Object.entries(x).filter(([key]) => keys_necessary.include(key))
+      Object.entries(x).filter(([key]) => keys_necessary.includes(key))
     );
   })
 
