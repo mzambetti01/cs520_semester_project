@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // function to format data from backend
-const processData = ({ league }) => {
+const useProcessData = ({ league }) => {
   const [playerIdData, setPlayerIdData] = useState([]);
   const [betData, setBetData] = useState([]);
 
@@ -50,7 +50,30 @@ const processData = ({ league }) => {
     fetchBetData();
   }, [players]);
 
-  return betData;
+  // merge the two data by playerID 
+  let finalData = playerIdData.map(x1 => {
+    const x2 = betData.find(x => x.PlayerID === x1.playerId);
+    return {
+      ...x1,
+      ...x2
+    }
+  })
+
+  // remove unecessary fields
+  // id, PlayerID, PlayerName, ExpectedValue, OverImpliedProb, UnderImpliedProb, OverAdjustedProb, UnderAdjustedProb
+  // OverAdjustedOdds, UnderAdjustedOdds <- nesaccery fields
+  const keys_necessary = ["PlayerID", "PlayerName", "ExpectedValue", 
+    "OverImpliedProb", "UnderImpliedProb", 
+    "OverAdjustedProb", "UnderAdjustedProb",
+    "OverAdjustedOdds", "UnderAdjustedOdds"]
+
+  finalData = finalData.map(x => {
+    return Object.fromEntries(
+      Object.entries(x).filter(([key]) => keys_necessary.include(key))
+    );
+  })
+
+  return finalData;
 };
 
-export default processData;
+export default useProcessData;

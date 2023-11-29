@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Table.css'
-import processData from './data';
+import useProcessData from './data';
 
 const findColor = (exp_val, max_val, min_val) => {
   // todo: adjust the interpolation so there;s a mid point color
@@ -35,21 +35,21 @@ const sortingData = (data, sortby) => {
 
 const Table = ({ sort, league, detailed, search, setMatched }) => {
   // fake data, need to integrate and grab real data
-  const data = [
-    { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
-    { id: 2, name: 'Item 2', prop_type: 'Category B', exp_val: 0.7, league: 'NBA', overAdj: 4, underAdj: 2 },
-    { id: 3, name: 'Item 3', prop_type: 'Category A', exp_val: 0.3, league: 'MLB', overAdj: 1, underAdj: 3 },
-  ];
+  // const data = [
+  //   { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
+  //   { id: 2, name: 'Item 2', prop_type: 'Category B', exp_val: 0.7, league: 'NBA', overAdj: 4, underAdj: 2 },
+  //   { id: 3, name: 'Item 3', prop_type: 'Category A', exp_val: 0.3, league: 'MLB', overAdj: 1, underAdj: 3 },
+  // ];
   
-  // grabbing real data now
-  const [data_r, setData] = useState([]);
+  // grabbing real data
+  let tableData = useProcessData(league);
 
 
   // Filtering 
-  let tableData = data.filter(
-    (item) =>
-      league === "" || item.league.toLowerCase() === league.toLowerCase()
-  );
+  // let tableData = data.filter(
+  //   (item) =>
+  //     league === "" || item.league.toLowerCase() === league.toLowerCase()
+  // );
 
   const max_val = tableData.reduce((acc, x) => acc >= x.exp_val ? acc : x.exp_val, -1);
   const min_val = tableData.reduce((acc, x) => acc <= x.exp_val ? acc : x.exp_val, 1);
