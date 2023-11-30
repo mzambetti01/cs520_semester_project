@@ -1,8 +1,8 @@
-// useProcessData.js
 import { useEffect, useState } from 'react';
 
 const useProcessData = (league) => {
   const [betData, setBetData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,13 +54,15 @@ const useProcessData = (league) => {
         setBetData(betData);
       } catch (error) {
         console.error('Error fetching or processing data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [league]);
 
-  return betData;
+  return { betData, loading };
 };
 
 export default useProcessData;

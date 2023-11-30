@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Table from './Table';
 import Footer from '../components/Footer';
 import './Page.css'
+import { useData } from './DataProvider';
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 const PageContent = ({ leagueName }) => {
   const [search, setSearch] = useState('');
@@ -71,6 +76,9 @@ const PageContent = ({ leagueName }) => {
     setDetailedView(!detailedView);
   };
 
+  let {data, loading} = useData();
+  let markets = [...new Set(data.filter(da => da.league === leagueName || leagueName === "").map(d => d.Market))];
+
   return (
     <div className='main'>
       <div className='wrapper'>
@@ -95,13 +103,13 @@ const PageContent = ({ leagueName }) => {
           <button onClick={handleFilterClick}> {filterUndo ? 'Undo Filter' : "Filter" }
           {filterDropdown && (
             <div className='sort-options'>
-              Market to show:
-              <button onClick={() => handleFilterOptionClick('assists')}>Assist</button>
-              <button onClick={() => handleFilterOptionClick('blocks')}>Blocks</button>
-              <button onClick={() => handleFilterOptionClick('points')}>Points</button>
-              <button onClick={() => handleFilterOptionClick('rebounds')}>Rebounds</button>
-              <button onClick={() => handleFilterOptionClick('steals')}>Steals</button>
-            </div>
+            Market to show:
+            {markets.map((market) => (
+              <button key={market} onClick={() => handleFilterOptionClick(market)}>
+                {capitalizeFirstLetter(market)}
+              </button>
+            ))}
+          </div>
           )}</button>
           <button onClick={handleDetailViewClick}>
             {detailedView ? 'Hide Details' : 'Show Details'}

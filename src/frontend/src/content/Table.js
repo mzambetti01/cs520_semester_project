@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Table.css'
-import useProcessData from './data';
+import { useData } from './DataProvider';
+import Loading from './Loading';
 
 const findColor = (exp_val, max_val, min_val) => {
   if (max_val === min_val) {
@@ -39,49 +40,10 @@ const sortingData = (data, sortby) => {
   return data
 }
 
-const helper = (data) => {
-  if (data.length === 0) {
-    return data;
-  }
-
-  if (data[0].length != 11) {
-    console.log("wrong data to be reformatted")
-    return null
-  } 
-
-  let keys = ["PlayerName", "league", "PlayerID", "Market", "ExpectedValue", 
-              "OverImpliedProb", "UnderImpliedProb", "OverAdjustedProb",
-              "UnderAdjustedProb", "OverAdjustedOdds", "UnderAdjustedOdds"];
-  let id = 0;
-  return data.map(d => {
-    let o =  keys.reduce((acc, k, i) => {
-      acc[k] = d[i];
-      return acc;
-    }, {}); 
-    o["ID"] = id;
-    id += 1;
-    return o;
-  })
-}
-
 const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
-  const [betData, setBetData] = useState([]);
-
-  // fake data, need to integrate and grab real data
-  let data = [
-    { PlayerID: 1, PlayerName: 'Item 1', ExpectedValue: 0.5, league: 'NBA', 
-    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
-    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 },
-    { PlayerID: 2, PlayerName: 'Item 2', ExpectedValue: 0.4, league: 'NBA', 
-    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
-    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 },
-    { PlayerID: 3, PlayerName: 'Item 7', ExpectedValue: 0.6, league: 'NBA', 
-    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
-    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 }
-  ];
-  
   // grabbing real data
-  data = helper(useProcessData(league));
+  let {data, loading} = useData();
+  data = data.filter(d => d.league === league || league === "");
 
   const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1000);
   const min_val = data.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1000);
@@ -116,27 +78,41 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((item) => (
-          <tr key={item.ID} 
-              style={{backgroundColor:findColor(item.ExpectedValue, max_val, min_val)}} 
-              className={item.highlighted ? 'highlighted' : ''}>
-            <td>{item.PlayerName}</td>
-            {<td>{item.Market}</td>}
-            {detailed && <td>
-              <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
-              <div style={{textAlign: "center"}}> {item.UnderImpliedProb.toFixed(4)} </div> 
-            </td>}
-            {detailed && <td>
-              <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
-              <div style={{textAlign: "center"}}> {item.UnderAdjustedProb.toFixed(4)} </div> 
-            </td>}
-            {detailed && <td>
-              <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
-              <div style={{textAlign: "center"}}> {item.UnderAdjustedOdds.toFixed(4)} </div> 
-            </td>}
-            <td>{item.ExpectedValue.toFixed(4)}</td>
+        {loading ? (
+          <tr>
+            <td colSpan={detailed ? 6 : 4}>Loading...</td>
           </tr>
-        ))}
+        ) : (
+          data.map((item) => (
+            <tr
+              key={item.ID}
+              style={{ backgroundColor: findColor(item.ExpectedValue, max_val, min_val) }}
+              className={item.highlighted ? 'highlighted' : ''}
+            >
+              <td>{item.PlayerName}</td>
+              {<td>{item.Market}</td>}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderImpliedProb.toFixed(4)} </div>
+                </td>
+              )}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedProb.toFixed(4)} </div>
+                </td>
+              )}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedOdds.toFixed(4)} </div>
+                </td>
+              )}
+              <td>{item.ExpectedValue.toFixed(4)}</td>
+            </tr>
+          ))
+        )}
       </tbody>
     </table>
     </div>
