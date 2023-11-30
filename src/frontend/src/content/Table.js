@@ -3,7 +3,9 @@ import './Table.css'
 import useProcessData from './data';
 
 const findColor = (exp_val, max_val, min_val) => {
-  // todo: adjust the interpolation so there;s a mid point color
+  if (max_val === min_val) {
+    return "rgb(238, 129, 89)"
+  }
   let norm = (exp_val - min_val) / (max_val - min_val)
 
   let r = Math.floor(238 + norm * (125 - 238));

@@ -1,109 +1,70 @@
-import React, { useState, useEffect } from 'react';
+// format data to a list of dictionaries of the actual names of fields
+const helper = (data) => {
+  if (data[0].length != 9) {
+    console.log("wrong data to be reformatted")
+    return null
+  }
+  
+}
 
 // function to format data from backend
 const useProcessData = async (league) => {
-  const [playerIdData, setPlayerIdData] = useState([]);
-  const [betData, setBetData] = useState([]);
   const allLeagues = ["nba", "nhl", "nfl"]
+  let data;
+  let resPlayerData = [];
+  let betData = [];
 
   // console.log(league)
-  const response = await fetch(`http://localhost:5000/players/${encodeURIComponent(league)}`);
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
+  if (league != "") {
+    const response = await fetch(`http://localhost:5000/players/${encodeURIComponent(league)}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    data = await response.json();
+    resPlayerData = data.response_object; 
+  } else {
+    // list of promisses
+    let responseArr = allLeagues.map(async (l) => {
+      const response = await fetch(`http://localhost:5000/players/${encodeURIComponent(l)}`)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      data = await response.json();
+      return data.response_object;
+    })
+    resPlayerData = await Promise.all(responseArr);
+    resPlayerData = resPlayerData.flat(1); 
   }
-  const data = await response.json();
-  console.log(data.response_object)
 
-  // useEffect(() => {
-  //   const fetchPlayerID = async () => {
-  //     try {
-  //       if (league === '') {
-  //         const playerPromises = allLeagues.map(async (l) => {
-  //           const response = await fetch(`http://localhost:5000/players/${encodeURIComponent(l)}`);
-  //           if (!response.ok) {
-  //             throw new Error(`Network response was not ok for league: ${l}`);
-  //           }
+  let players = resPlayerData.map(p => [p[0], decodeURIComponent(p[1])]);
+  console.log(players);
 
-  //           const data = await response.json();
-  //           return data.response_object;
-  //         })
+  let betDataArr = players.map(async (x) => {
+    const response = await fetch(`http://localhost:5000/player_betting_data/${encodeURIComponent(x[0])}`)
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    data = await response.json();
+    return data.response_object;
+  })
 
-  //         const playerDataArr = await Promise.all(playerPromises);
-          
-  //         setPlayerIdData(playerDataArr);
-
-  //       } else {
-  //         // Fetch data for a specific league
-  //         const response = await fetch(`http://localhost:5000/players/${encodeURIComponent(league)}`);
-  //         if (!response.ok) {
-  //           throw new Error('Network response was not ok');
-  //         }
-  //         const data = await response.json();
-  //         setPlayerIdData(data.response_object);
-  //       }
-        
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-  
-  //   fetchPlayerID();
-  // }, [league]);
-
-  let players = data.response_object.map(p => p[0]);
-  console.log(players)
-
-  // useEffect(() => {
-  //   const fetchBetData = async () => {
-  //     try {
-  //       const betDataPromises = players.map(async (playerId) => {
-  //         const response = await fetch(`http://localhost:5000/player_betting_data/${encodeURIComponent(playerId)}`);
-          
-  //         if (!response.ok) {
-  //           throw new Error(`Network response was not ok for PlayerID ${encodeURIComponent(playerId)}`);
-  //         }
-  
-  //         const data = await response.json();
-  //         return data.response_object;
-  //       });
-  
-  //       // Wait for all promises to resolve
-  //       const betDataArr = await Promise.all(betDataPromises);
-  //       setBetData(betDataArr);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-  
-  //   fetchBetData();
-  // }, [players]);
+  betData = await Promise.all(betDataArr);
+  console.log(betData.flat(1));
+  const indxToKeep = [3,4,5,6,10,11,12,13]; // todo: wrong indices
+  betData = betData.flat(1).map(d => indxToKeep.map(i => d[i])); // cleaning up the data array
 
   // merge the two data by playerID 
-  let finalData = playerIdData.map(x1 => {
-    const x2 = betData.find(x => x.PlayerID === x1.playerId);
-    return {
-      ...x1,
-      ...x2
-    }
+  betData = betData.map((bet) => {
+    // find the player by id in bet, concat the player info to bet info
+    let p = players.find((player) => player[0] === bet[0]);
+    return [p[1], ...bet];
   })
 
-  // remove unecessary fields
-  // id, PlayerID, PlayerName, ExpectedValue, OverImpliedProb, UnderImpliedProb, OverAdjustedProb, UnderAdjustedProb
-  // OverAdjustedOdds, UnderAdjustedOdds <- nesaccery fields
-  const keys_necessary = ["PlayerID", "PlayerName", "ExpectedValue", 
-    "OverImpliedProb", "UnderImpliedProb", 
-    "OverAdjustedProb", "UnderAdjustedProb",
-    "OverAdjustedOdds", "UnderAdjustedOdds"]
+  console.log(betData);
 
-  finalData = finalData.map(x => {
-    return Object.fromEntries(
-      Object.entries(x).filter(([key]) => keys_necessary.includes(key))
-    );
-  })
 
-  // console.log(finalData)
 
-  return finalData;
+  return betData;
 };
 
 export default useProcessData;
