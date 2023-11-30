@@ -5,6 +5,7 @@ import os
 import json 
 from datetime import datetime, timedelta
 import threading 
+from flask_cors import CORS
 
 import time
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -16,6 +17,7 @@ from src.backend.web_scraper.web_scraper import WebScraper
 webscraper = WebScraper()
 database_handler = DatabaseHandler()
 app = Flask(__name__)
+CORS(app)
 
 # Endpoint to get a list of players in a league
 @app.route('/players/<string:sports_league>', methods=['GET'])

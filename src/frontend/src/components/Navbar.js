@@ -17,13 +17,10 @@ const Navbar = () => (
         <Link to="/nba" className='nav-item'>NBA</Link>
       </li>
       <li>
-        <Link to="/mlb" className='nav-item'>MLB</Link>
-      </li>
-      <li>
         <Link to="/nfl" className='nav-item'>NFL</Link>
       </li>
       <li>
-        <Link to="/ncaaf" className='nav-item'>NCAAF</Link>
+        <Link to="/nhl" className='nav-item'>NHL</Link>
       </li>
       <li className="dropdown">
         <div className='nav-item'>Resources</div>

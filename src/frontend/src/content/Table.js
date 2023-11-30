@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Table.css'
+import { useData } from './DataProvider';
+import Loading from './Loading';
 
 const findColor = (exp_val, max_val, min_val) => {
-  // todo: adjust the interpolation so there;s a mid point color
+  if (max_val === min_val) {
+    return "rgb(238, 129, 89)"
+  }
   let norm = (exp_val - min_val) / (max_val - min_val)
 
   let r = Math.floor(238 + norm * (125 - 238));
@@ -17,51 +21,47 @@ const sortingData = (data, sortby) => {
     return data;
   }
 
-  if (typeof data[0][sortby] === 'number') {
+  const [sortField, sortAsc] = sortby.split(' ');
+
+  if (typeof data[0][sortField] === 'number') {
     data = data.slice().sort((a, b) => {
-      return a[sortby] - b[sortby];
+      const comparison = a[sortField] - b[sortField];
+      return sortAsc === 'true' ? comparison : -comparison;
     });
-  } else if (typeof data[0][sortby] === 'string') {
+  } else if (typeof data[0][sortField] === 'string') {
     data = data.slice().sort((a, b) => {
-      const aValue = String(a[sortby]).toLowerCase(); // Convert to lowercase for case-insensitive sorting
-      const bValue = String(b[sortby]).toLowerCase();
+      const aValue = String(a[sortField]).toLowerCase(); // Convert to lowercase for case-insensitive sorting
+      const bValue = String(b[sortField]).toLowerCase();
   
-      return aValue.localeCompare(bValue);
+      const comparison = aValue.localeCompare(bValue);
+      return sortAsc === 'false' ? comparison : -comparison;
     });
   }
   return data
 }
 
-const Table = ({ sort, league, detailed, search, setMatched }) => {
-  // fake data, need to integrate and grab real data
-  const data = [
-    { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
-    { id: 2, name: 'Item 2', prop_type: 'Category B', exp_val: 0.7, league: 'NBA', overAdj: 4, underAdj: 2 },
-    { id: 3, name: 'Item 3', prop_type: 'Category A', exp_val: 0.3, league: 'MLB', overAdj: 1, underAdj: 3 },
-  ];
+const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
+  // grabbing real data
+  let {data, loading} = useData();
+  data = data.filter(d => d.league === league || league === "");
 
-  // Filtering 
-  let tableData = data.filter(
-    (item) =>
-      league === "" || item.league.toLowerCase() === league.toLowerCase()
-  );
+  const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1000);
+  const min_val = data.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1000);
 
-  const max_val = tableData.reduce((acc, x) => acc >= x.exp_val ? acc : x.exp_val, -1);
-  const min_val = tableData.reduce((acc, x) => acc <= x.exp_val ? acc : x.exp_val, 1);
-
-  tableData = tableData.slice().sort((a, b) => b.exp_val - a.exp_val);
+  data = data.slice().sort((a, b) => b.ExpectedValue - a.ExpectedValue);
 
   // if sort specified, sort by specified thing first
-  console.log(sort)
-  tableData = sortingData(tableData, sort);
+  data = sortingData(data, sort);
+
+  // filtering logic
+  data = data.filter((item) => filter === "" || item.Market === filter);
 
   // if searched, set highlight to true
-  tableData = tableData.map((item) => ({
+  data = data.map((item) => ({
     ...item,
-      highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase()) ||
-                   item.prop_type.toLowerCase().includes(search.toLowerCase())
+      highlighted: search === "" ? false : item.PlayerName.toLowerCase().includes(search.toLowerCase())
   }));
-  let match = tableData.reduce((acc, x) => acc || x.highlighted, false)
+  let match = data.reduce((acc, x) => acc || x.highlighted, false) || search === "";
   setMatched(match)
 
   return (
@@ -70,35 +70,44 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
       <thead>
         <tr>
           <th>Player</th>
-          <th>Prop Type</th>
-          {detailed && <th>Odds</th>}
+          {<th>Market</th>}
+          {detailed && <th>Implied Prob</th>}
           {detailed && <th>Adjusted Prob</th>}
           {detailed && <th>Adjusted Odds</th>}
           <th>Expected Value</th>
         </tr>
       </thead>
       <tbody>
-        {tableData.map((item) => (
-          <tr key={item.id} 
-              style={{backgroundColor:findColor(item.exp_val, max_val, min_val)}} 
-              className={item.highlighted ? 'highlighted' : ''}>
-            <td>{item.name}</td>
-            <td>{item.prop_type}</td>
-            {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
-            </td>}
-            {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
-            </td>}
-            {detailed && <td>
-              <div className='subrow'> {item.overAdj} </div>
-              <div style={{textAlign: "center"}}> {item.underAdj} </div> 
-            </td>}
-            <td>{item.exp_val}</td>
-          </tr>
-        ))}
+        {data.map((item) => (
+            <tr
+              key={item.ID}
+              style={{ backgroundColor: findColor(item.ExpectedValue, max_val, min_val) }}
+              className={item.highlighted ? 'highlighted' : ''}
+            >
+              <td>{item.PlayerName}</td>
+              {<td>{item.Market}</td>}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderImpliedProb.toFixed(4)} </div>
+                </td>
+              )}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedProb.toFixed(4)} </div>
+                </td>
+              )}
+              {detailed && (
+                <td>
+                  <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
+                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedOdds.toFixed(4)} </div>
+                </td>
+              )}
+              <td>{item.ExpectedValue.toFixed(4)}</td>
+            </tr>
+          ))
+        }
       </tbody>
     </table>
     </div>
