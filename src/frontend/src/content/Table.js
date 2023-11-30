@@ -35,28 +35,35 @@ const sortingData = (data, sortby) => {
 
 const Table = ({ sort, league, detailed, search, setMatched }) => {
   // fake data, need to integrate and grab real data
-  // const data = [
-  //   { id: 1, name: 'Item 1', prop_type: 'Category A', exp_val: 0.5, league: 'NBA', overAdj: 1, underAdj: 2 },
-  //   { id: 2, name: 'Item 2', prop_type: 'Category B', exp_val: 0.7, league: 'NBA', overAdj: 4, underAdj: 2 },
-  //   { id: 3, name: 'Item 3', prop_type: 'Category A', exp_val: 0.3, league: 'MLB', overAdj: 1, underAdj: 3 },
-  // ];
+  const data = [
+    { PlayerID: 1, PlayerName: 'Item 1', ExpectedValue: 0.5, league: 'NBA', 
+    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
+    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 },
+    { PlayerID: 2, PlayerName: 'Item 2', ExpectedValue: 0.4, league: 'NBA', 
+    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
+    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 },
+    { PlayerID: 3, PlayerName: 'Item 7', ExpectedValue: 0.6, league: 'NBA', 
+    OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
+    UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 }
+  ];
   
   // grabbing real data
-  let tableData = useProcessData(league);
+  useProcessData("nba");
+  // console.log(tableData);
 
   // Filtering 
-  // let tableData = data.filter(
-  //   (item) =>
-  //     league === "" || item.league.toLowerCase() === league.toLowerCase()
-  // );
+  let tableData = data.filter(
+    (item) =>
+      league === "" || item.league.toLowerCase() === league.toLowerCase()
+  );
 
-  const max_val = tableData.reduce((acc, x) => acc >= x.ExpenctedValue ? acc : x.ExpenctedValue, -1);
-  const min_val = tableData.reduce((acc, x) => acc <= x.ExpenctedValue ? acc : x.ExpenctedValue, 1);
+  const max_val = tableData.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1);
+  const min_val = tableData.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1);
 
-  tableData = tableData.slice().sort((a, b) => b.ExpenctedValue - a.ExpenctedValue);
+  tableData = tableData.slice().sort((a, b) => b.ExpectedValue - a.ExpectedValue);
 
   // if sort specified, sort by specified thing first
-  console.log(sort)
+  // console.log(sort)
   tableData = sortingData(tableData, sort);
 
   // if searched, set highlight to true
@@ -83,7 +90,7 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
       <tbody>
         {tableData.map((item) => (
           <tr key={item.PlayerID} 
-              style={{backgroundColor:findColor(item.exp_val, max_val, min_val)}} 
+              style={{backgroundColor:findColor(item.ExpectedValue, max_val, min_val)}} 
               className={item.highlighted ? 'highlighted' : ''}>
             <td>{item.PlayerName}</td>
             {/* <td>{item.prop_type}</td> */}
