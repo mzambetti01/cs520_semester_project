@@ -78,12 +78,7 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
         </tr>
       </thead>
       <tbody>
-        {loading ? (
-          <tr>
-            <td colSpan={detailed ? 6 : 4}>Loading...</td>
-          </tr>
-        ) : (
-          data.map((item) => (
+        {data.map((item) => (
             <tr
               key={item.ID}
               style={{ backgroundColor: findColor(item.ExpectedValue, max_val, min_val) }}
@@ -112,7 +107,7 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
               <td>{item.ExpectedValue.toFixed(4)}</td>
             </tr>
           ))
-        )}
+        }
       </tbody>
     </table>
     </div>

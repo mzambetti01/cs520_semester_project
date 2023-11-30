@@ -3,6 +3,7 @@ import Table from './Table';
 import Footer from '../components/Footer';
 import './Page.css'
 import { useData } from './DataProvider';
+import Loading from './Loading';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -115,8 +116,11 @@ const PageContent = ({ leagueName }) => {
             {detailedView ? 'Hide Details' : 'Show Details'}
           </button>
         </div>
-        
-        <Table sort={sortOption} league={ leagueName } detailed={ detailedView } search={ search } setMatched={setMatched} filter={filterOption}/>
+        {loading ? (
+          <Loading />
+        ) : (
+          <Table sort={sortOption} league={leagueName} detailed={detailedView} search={search} setMatched={setMatched} filter={filterOption} />
+        )}
       </div>
       
       <div> <Footer /> </div>
