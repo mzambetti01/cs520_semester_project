@@ -35,6 +35,32 @@ const sortingData = (data, sortby) => {
   return data
 }
 
+const helper = (data) => {
+  if (data.length === 0) {
+    return data;
+  }
+
+  if (data[0].length != 10) {
+    console.log("wrong data to be reformatted")
+    return null
+  } 
+
+  let keys = ["PlayerName", "league", "PlayerID", "ExpectedValue", 
+              "OverImpliedProb", "UnderImpliedProb", "OverAdjustedProb",
+              "UnderAdjustedProb", "OverAdjustedOdds", "UnderAdjustedOdds"];
+  let id = 0;
+  return data.map(d => {
+    let o =  keys.reduce((acc, k, i) => {
+      acc[k] = d[i];
+      return acc;
+    }, {}); 
+    o["ID"] = id;
+    o["ExpectedValue"] = id * 0.5; // mock value for now
+    id += 1;
+    return o;
+  })
+}
+
 const Table = ({ sort, league, detailed, search, setMatched }) => {
   const [betData, setBetData] = useState([]);
 
@@ -52,42 +78,29 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
   ];
   
   // grabbing real data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await useProcessData(league);
-        setBetData(data);
-      } catch (error) {
-        console.error('Error fetching or processing data:', error);
-      }
-    };
-
-    fetchData();
-  }, [league]);
-
-  console.log(betData);
+  data = helper(useProcessData(league));
 
   // Filtering 
-  let tableData = data.filter(
-    (item) =>
-      league === "" || item.league.toLowerCase() === league.toLowerCase()
-  );
+  // let tableData = data.filter(
+  //   (item) =>
+  //     league === "" || item.league.toLowerCase() === league.toLowerCase()
+  // );
 
-  const max_val = tableData.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1);
-  const min_val = tableData.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1);
+  const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1);
+  const min_val = data.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1);
 
-  tableData = tableData.slice().sort((a, b) => b.ExpectedValue - a.ExpectedValue);
+  data = data.slice().sort((a, b) => b.ExpectedValue - a.ExpectedValue);
 
   // if sort specified, sort by specified thing first
   // console.log(sort)
-  tableData = sortingData(tableData, sort);
+  data = sortingData(data, sort);
 
   // if searched, set highlight to true
-  tableData = tableData.map((item) => ({
+  data = data.map((item) => ({
     ...item,
-      highlighted: search === "" ? false : item.name.toLowerCase().includes(search.toLowerCase())
+      highlighted: search === "" ? false : item.PlayerName.toLowerCase().includes(search.toLowerCase())
   }));
-  let match = tableData.reduce((acc, x) => acc || x.highlighted, false)
+  let match = data.reduce((acc, x) => acc || x.highlighted, false)
   setMatched(match)
 
   return (
@@ -104,23 +117,23 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
         </tr>
       </thead>
       <tbody>
-        {tableData.map((item) => (
-          <tr key={item.PlayerID} 
+        {data.map((item) => (
+          <tr key={item.ID} 
               style={{backgroundColor:findColor(item.ExpectedValue, max_val, min_val)}} 
               className={item.highlighted ? 'highlighted' : ''}>
             <td>{item.PlayerName}</td>
             {/* <td>{item.prop_type}</td> */}
             {detailed && <td>
-              <div className='subrow'> {item.OverImpliedProb} </div>
-              <div style={{textAlign: "center"}}> {item.UnderImpliedProb} </div> 
+              <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
+              <div style={{textAlign: "center"}}> {item.UnderImpliedProb.toFixed(4)} </div> 
             </td>}
             {detailed && <td>
-              <div className='subrow'> {item.OverAdjustedProb} </div>
-              <div style={{textAlign: "center"}}> {item.UnderAdjustedProb} </div> 
+              <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
+              <div style={{textAlign: "center"}}> {item.UnderAdjustedProb.toFixed(4)} </div> 
             </td>}
             {detailed && <td>
-              <div className='subrow'> {item.OverAdjustedOdds} </div>
-              <div style={{textAlign: "center"}}> {item.UnderAdjustedOdds} </div> 
+              <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
+              <div style={{textAlign: "center"}}> {item.UnderAdjustedOdds.toFixed(4)} </div> 
             </td>}
             <td>{item.ExpectedValue}</td>
           </tr>
