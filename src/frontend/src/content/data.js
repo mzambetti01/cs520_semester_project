@@ -42,7 +42,7 @@ const useProcessData = (league) => {
         });
 
         let betData = await Promise.all(betDataArr);
-        const indxToKeep = [3, 4, 5, 6, 10, 11, 12, 13];
+        const indxToKeep = [3, 4, 5, 6, 7, 11, 12, 13, 14];
         betData = betData.flat(1).map(d => indxToKeep.map(i => d[i]));
 
         // merge the two data by playerID

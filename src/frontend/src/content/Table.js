@@ -20,16 +20,20 @@ const sortingData = (data, sortby) => {
     return data;
   }
 
-  if (typeof data[0][sortby] === 'number') {
+  const [sortField, sortAsc] = sortby.split(' ');
+
+  if (typeof data[0][sortField] === 'number') {
     data = data.slice().sort((a, b) => {
-      return a[sortby] - b[sortby];
+      const comparison = a[sortField] - b[sortField];
+      return sortAsc === 'true' ? comparison : -comparison;
     });
-  } else if (typeof data[0][sortby] === 'string') {
+  } else if (typeof data[0][sortField] === 'string') {
     data = data.slice().sort((a, b) => {
-      const aValue = String(a[sortby]).toLowerCase(); // Convert to lowercase for case-insensitive sorting
-      const bValue = String(b[sortby]).toLowerCase();
+      const aValue = String(a[sortField]).toLowerCase(); // Convert to lowercase for case-insensitive sorting
+      const bValue = String(b[sortField]).toLowerCase();
   
-      return aValue.localeCompare(bValue);
+      const comparison = aValue.localeCompare(bValue);
+      return sortAsc === 'false' ? comparison : -comparison;
     });
   }
   return data
@@ -40,12 +44,12 @@ const helper = (data) => {
     return data;
   }
 
-  if (data[0].length != 10) {
+  if (data[0].length != 11) {
     console.log("wrong data to be reformatted")
     return null
   } 
 
-  let keys = ["PlayerName", "league", "PlayerID", "ExpectedValue", 
+  let keys = ["PlayerName", "league", "PlayerID", "Market", "ExpectedValue", 
               "OverImpliedProb", "UnderImpliedProb", "OverAdjustedProb",
               "UnderAdjustedProb", "OverAdjustedOdds", "UnderAdjustedOdds"];
   let id = 0;
@@ -55,13 +59,12 @@ const helper = (data) => {
       return acc;
     }, {}); 
     o["ID"] = id;
-    o["ExpectedValue"] = id * 0.5; // mock value for now
     id += 1;
     return o;
   })
 }
 
-const Table = ({ sort, league, detailed, search, setMatched }) => {
+const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
   const [betData, setBetData] = useState([]);
 
   // fake data, need to integrate and grab real data
@@ -80,27 +83,23 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
   // grabbing real data
   data = helper(useProcessData(league));
 
-  // Filtering 
-  // let tableData = data.filter(
-  //   (item) =>
-  //     league === "" || item.league.toLowerCase() === league.toLowerCase()
-  // );
-
-  const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1);
-  const min_val = data.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1);
+  const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1000);
+  const min_val = data.reduce((acc, x) => acc <= x.ExpectedValue ? acc : x.ExpectedValue, 1000);
 
   data = data.slice().sort((a, b) => b.ExpectedValue - a.ExpectedValue);
 
   // if sort specified, sort by specified thing first
-  // console.log(sort)
   data = sortingData(data, sort);
+
+  // filtering logic
+  data = data.filter((item) => filter === "" || item.Market === filter);
 
   // if searched, set highlight to true
   data = data.map((item) => ({
     ...item,
       highlighted: search === "" ? false : item.PlayerName.toLowerCase().includes(search.toLowerCase())
   }));
-  let match = data.reduce((acc, x) => acc || x.highlighted, false)
+  let match = data.reduce((acc, x) => acc || x.highlighted, false) || search === "";
   setMatched(match)
 
   return (
@@ -109,7 +108,7 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
       <thead>
         <tr>
           <th>Player</th>
-          {/* <th>Prop Type</th> */}
+          {<th>Market</th>}
           {detailed && <th>Implied Prob</th>}
           {detailed && <th>Adjusted Prob</th>}
           {detailed && <th>Adjusted Odds</th>}
@@ -122,7 +121,7 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
               style={{backgroundColor:findColor(item.ExpectedValue, max_val, min_val)}} 
               className={item.highlighted ? 'highlighted' : ''}>
             <td>{item.PlayerName}</td>
-            {/* <td>{item.prop_type}</td> */}
+            {<td>{item.Market}</td>}
             {detailed && <td>
               <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
               <div style={{textAlign: "center"}}> {item.UnderImpliedProb.toFixed(4)} </div> 
@@ -135,7 +134,7 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
               <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
               <div style={{textAlign: "center"}}> {item.UnderAdjustedOdds.toFixed(4)} </div> 
             </td>}
-            <td>{item.ExpectedValue}</td>
+            <td>{item.ExpectedValue.toFixed(4)}</td>
           </tr>
         ))}
       </tbody>
