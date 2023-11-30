@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 // format data to a list of dictionaries of the actual names of fields
 const helper = (data) => {
   if (data[0].length != 10) {
@@ -43,7 +45,6 @@ const useProcessData = async (league) => {
     players = await Promise.all(responseArr);
     players = players.flat(1); 
   }
-  console.log(players);
 
   // get bet data for each player
   let betDataArr = players.map(async (x) => {
@@ -66,11 +67,7 @@ const useProcessData = async (league) => {
     return [p[1], p[2], ...bet]; // player name, league, the rest
   })
 
-  console.log(betData);
-  console.log(helper(betData))
-
-
-  return betData;
+  return helper(betData);
 };
 
 export default useProcessData;

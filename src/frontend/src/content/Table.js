@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Table.css'
 import useProcessData from './data';
 
@@ -36,8 +36,10 @@ const sortingData = (data, sortby) => {
 }
 
 const Table = ({ sort, league, detailed, search, setMatched }) => {
+  const [betData, setBetData] = useState([]);
+
   // fake data, need to integrate and grab real data
-  const data = [
+  let data = [
     { PlayerID: 1, PlayerName: 'Item 1', ExpectedValue: 0.5, league: 'NBA', 
     OverImpliedProb: 1, UnderImpliedProb: 2, OverAdjustedProb: 4, 
     UnderAdjustedProb: 3, OverAdjustedOdds: 7, UnderAdjustedOdds: 8 },
@@ -50,8 +52,20 @@ const Table = ({ sort, league, detailed, search, setMatched }) => {
   ];
   
   // grabbing real data
-  useProcessData("nba");
-  // console.log(tableData);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await useProcessData(league);
+        setBetData(data);
+      } catch (error) {
+        console.error('Error fetching or processing data:', error);
+      }
+    };
+
+    fetchData();
+  }, [league]);
+
+  console.log(betData);
 
   // Filtering 
   let tableData = data.filter(
