@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Table.css'
 import { useData } from './DataProvider';
-import Loading from './Loading';
+import SubRow from './SubEntry';
 
 const findColor = (exp_val, max_val, min_val) => {
   if (max_val === min_val) {
@@ -41,8 +41,15 @@ const sortingData = (data, sortby) => {
 }
 
 const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
+  const [clickedRowIndex, setClickedRowIndex] = useState(null);
+
+  const handleClick = (index) => {
+    setClickedRowIndex(index === clickedRowIndex ? null : index);
+  };
+
   // grabbing real data
   let {data, loading} = useData();
+  console.log(data);
   data = data.filter(d => d.league === league || league === "");
 
   const max_val = data.reduce((acc, x) => acc >= x.ExpectedValue ? acc : x.ExpectedValue, -1000);
@@ -78,34 +85,89 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((item) => (
-            <tr
-              key={item.ID}
-              style={{ backgroundColor: findColor(item.ExpectedValue, max_val, min_val) }}
-              className={item.highlighted ? 'highlighted' : ''}
-            >
-              <td>{item.PlayerName}</td>
-              {<td>{item.Market}</td>}
-              {detailed && (
-                <td>
-                  <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
-                  <div style={{ textAlign: 'center' }}> {item.UnderImpliedProb.toFixed(4)} </div>
-                </td>
+        {data.map((item, index) => (
+            <React.Fragment key={item.ID}>
+              <tr
+                key={item.ID}
+                style={{ backgroundColor: findColor(item.ExpectedValue, max_val, min_val) }}
+                className={item.highlighted ? 'highlighted' : ''}
+                onClick={() => handleClick(index)}
+              >
+                <td>{item.PlayerName}</td>
+                {<td>{item.Market}</td>}
+                {detailed && (
+                  <td>
+                    <div className='subrow'> {item.OverImpliedProb.toFixed(4)} </div>
+                    <div style={{ textAlign: 'center' }}> {item.UnderImpliedProb.toFixed(4)} </div>
+                  </td>
+                )}
+                {detailed && (
+                  <td>
+                    <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
+                    <div style={{ textAlign: 'center' }}> {item.UnderAdjustedProb.toFixed(4)} </div>
+                  </td>
+                )}
+                {detailed && (
+                  <td>
+                    <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
+                    <div style={{ textAlign: 'center' }}> {item.UnderAdjustedOdds.toFixed(4)} </div>
+                  </td>
+                )}
+                <td>{item.ExpectedValue.toFixed(4)}</td>
+              </tr>
+
+              {index === clickedRowIndex && (
+                <tr>
+                  <td colSpan="4">
+                    {/* subTable */}
+                    <table className="mini-table">
+                      <thead>
+                        <tr>
+                          <th>Sportsbook</th>
+                          <th>Player</th>
+                          <th>Market</th>
+                          {detailed && <th>Implied Prob</th>}
+                          {detailed && <th>Adjusted Prob</th>}
+                          {detailed && <th>Adjusted Odds</th>}
+                          <th>Expected Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {item.list.map(sub => {
+                       <tr
+                          key={sub.ID}
+                          style={{ backgroundColor: findColor(sub.ExpectedValue, max_val, min_val) }}
+                          className={item.highlighted ? 'highlighted' : ''}
+                        >
+                          <td>{sub.BookName}</td>
+                          <td>{sub.PlayerName}</td>
+                          <td>{sub.Market}</td>
+                          {detailed && (
+                            <td>
+                              <div className='subrow'> {sub.OverImpliedProb.toFixed(4)} </div>
+                              <div style={{ textAlign: 'center' }}> {sub.UnderImpliedProb.toFixed(4)} </div>
+                            </td>
+                          )}
+                          {detailed && (
+                            <td>
+                              <div className='subrow'> {sub.OverAdjustedProb.toFixed(4)} </div>
+                              <div style={{ textAlign: 'center' }}> {sub.UnderAdjustedProb.toFixed(4)} </div>
+                            </td>
+                          )}
+                          {detailed && (
+                            <td>
+                              <div className='subrow'> {sub.OverAdjustedOdds.toFixed(4)} </div>
+                              <div style={{ textAlign: 'center' }}> {sub.UnderAdjustedOdds.toFixed(4)} </div>
+                            </td>
+                          )}
+                          <td>{sub.ExpectedValue.toFixed(4)}</td>
+                        </tr>})}
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
               )}
-              {detailed && (
-                <td>
-                  <div className='subrow'> {item.OverAdjustedProb.toFixed(4)} </div>
-                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedProb.toFixed(4)} </div>
-                </td>
-              )}
-              {detailed && (
-                <td>
-                  <div className='subrow'> {item.OverAdjustedOdds.toFixed(4)} </div>
-                  <div style={{ textAlign: 'center' }}> {item.UnderAdjustedOdds.toFixed(4)} </div>
-                </td>
-              )}
-              <td>{item.ExpectedValue.toFixed(4)}</td>
-            </tr>
+            </React.Fragment>
           ))
         }
       </tbody>

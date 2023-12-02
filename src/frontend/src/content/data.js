@@ -8,6 +8,7 @@ const useProcessData = (league) => {
     const fetchData = async () => {
       try {
         const allLeagues = ["nba", "nhl", "nfl"];
+        console.log("fetching");
         let data;
         let players;
 
@@ -42,15 +43,16 @@ const useProcessData = (league) => {
         });
 
         let betData = await Promise.all(betDataArr);
-        const indxToKeep = [3, 4, 5, 6, 7, 11, 12, 13, 14];
+        const indxToKeep = [1, 3, 4, 5, 6, 7, 11, 12, 13, 14];
         betData = betData.flat(1).map(d => indxToKeep.map(i => d[i]));
-
         // merge the two data by playerID
         betData = betData.map((bet) => {
-          let p = players.find((player) => player[0] === bet[0]);
+          let p = players.find((player) => player[0] === bet[1]);
+          if (p === undefined) {
+            return null
+          }
           return [p[1], p[2], ...bet];
-        });
-
+        }).filter(x => x != null);
         setBetData(betData);
       } catch (error) {
         console.error('Error fetching or processing data:', error);
