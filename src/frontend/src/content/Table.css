@@ -3,6 +3,7 @@
     padding-top: 20px;
     margin: auto;
     width: 95%;
+    overflow: hidden;
 }
 
 .table {
@@ -37,10 +38,9 @@ td .subrow {
    
 /* Table Body Style */
 .table tbody {
-    /* height: 120px;  */
-    overflow-y: auto;
+    overflow: hidden; /* Hide overflow to prevent layout shifts */
 }
-  
+
 /* Individual Table Rows Style */
 .table tbody tr {
     width: 100%;
@@ -60,4 +60,22 @@ td .subrow {
     to {
         box-shadow: 0 0 5px 5px #FCDB7C;
     }
+}
+
+/* subtable styling */
+.sub-table-wrapper {
+    transition: max-height 0.3s ease-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.subTableWrapper.open {
+    max-height: 1000px;
+}
+
+.mini-table {
+    width: 100%;
+    margin-left: 15px;
+    box-sizing: border-box;
+    transition: width 0.3s ease-out; /* Add transition for width */
 }

@@ -117,8 +117,8 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
               </tr>
 
               {index === clickedRowIndex && (
-                <tr>
-                  <td colSpan="4">
+                <tr className="sub-table-wrapper">
+                  <td colSpan= { detailed ? 6 : 4 }>
                     {/* subTable */}
                     <table className="mini-table">
                       <thead>
@@ -133,7 +133,7 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
                         </tr>
                       </thead>
                       <tbody>
-                      {item.list.map(sub => {
+                      {item.list.map(sub => (
                        <tr
                           key={sub.ID}
                           style={{ backgroundColor: findColor(sub.ExpectedValue, max_val, min_val) }}
@@ -161,7 +161,7 @@ const Table = ({ sort, league, detailed, search, setMatched, filter }) => {
                             </td>
                           )}
                           <td>{sub.ExpectedValue.toFixed(4)}</td>
-                        </tr>})}
+                        </tr>))}
                       </tbody>
                     </table>
                   </td>
