@@ -22,13 +22,8 @@ const Navbar = () => (
       <li>
         <Link to="/nhl" className='nav-item'>NHL</Link>
       </li>
-      <li className="dropdown">
-        <div className='nav-item'>Resources</div>
-        <div className="dropdown-content">
-          <Link to="/resources1">How to read our data</Link>
-          <Link to="/resources2">What is sport betting</Link>
-          <Link to="/resources3">Additional resources</Link>
-        </div>
+      <li>
+        <Link to="/resources" className='nav-item'>Resources</Link>
       </li>
     </ul>
   </nav>
